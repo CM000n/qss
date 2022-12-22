@@ -89,6 +89,7 @@ class QuestDB(threading.Thread):
 
         self.hass = hass
         self.queue: Any = queue.Queue()
+        self.async_db_ready = asyncio.Future()
         self.host = host
         self.port = port
         self.entity_filter = entity_filter
