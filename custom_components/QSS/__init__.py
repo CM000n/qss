@@ -113,8 +113,8 @@ class QuestDB(threading.Thread):
         ):
             self.queue.put(event)
 
-    def insert(self, event):
-         @callback
+    def insert(self):
+        @callback
         def register():
             """Post connection initialize."""
             self.async_db_ready.set_result(True)
@@ -143,6 +143,9 @@ class QuestDB(threading.Thread):
 
         self.hass.add_job(register)
         result = hass_started.result()
+        # If shutdown happened before Home Assistant finished starting
+        if result is shutdown_task:
+            return
 
         while True:
             event = self.queue.get()
@@ -175,4 +178,3 @@ class QuestDB(threading.Thread):
             except IngressError as e:
                 sys.stderr.write(f"Got error: {e}\n")
                 self.queue.task_done()
-            
