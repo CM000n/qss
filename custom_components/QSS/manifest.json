@@ -4,7 +4,7 @@
     "name": "QuestDB State Storage (QSS)",
     "documentation": "https://github.com/CM000n/QSS",
     "requirements": [
-        "psycopg2>=2.8,<3.0"
+        "psycopg2>=2.9,<3.0"
     ],
     "dependencies": [],
     "codeowners": [
