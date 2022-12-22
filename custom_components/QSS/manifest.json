@@ -1,10 +1,10 @@
 {
-    "domain": "QSS",
+    "domain": "qss",
     "version": "0.0.1",
     "name": "QuestDB State Storage (QSS)",
     "documentation": "https://github.com/CM000n/QSS",
     "requirements": [
-        "psycopg2>=2.9,<3.0"
+        "questdb>=1.0.2,<2.0"
     ],
     "dependencies": [],
     "codeowners": [
