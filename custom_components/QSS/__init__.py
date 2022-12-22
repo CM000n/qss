@@ -12,7 +12,6 @@ from typing import Any, Callable, Dict, Optional
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
-import psycopg2
 import voluptuous as vol
 from homeassistant.components import persistent_notification
 from homeassistant.const import (
@@ -34,12 +33,6 @@ from homeassistant.helpers.entityfilter import (
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.typing import ConfigType
 from questdb.ingress import IngressError, Sender
-from sqlalchemy import create_engine, exc, inspect, text
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-
-from .migrations import check_and_migrate
-from .models import LTSS, Base
 
 _LOGGER = logging.getLogger(__name__)
 
