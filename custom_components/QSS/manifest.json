@@ -1,0 +1,13 @@
+{
+    "domain": "ltss",
+    "version": "1.1.0",
+    "name": "QuestDB State Storage (QSS)",
+    "documentation": "https://github.com/CM000n/QSS",
+    "requirements": [
+        "psycopg2>=2.8,<3.0"
+    ],
+    "dependencies": [],
+    "codeowners": [
+        "@CM000n"
+    ]
+}
