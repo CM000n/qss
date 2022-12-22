@@ -99,21 +99,10 @@ class QuestDB(threading.Thread):
         """Initialize QSS."""
         self.hass.bus.async_listen(EVENT_STATE_CHANGED, self.event_listener)
 
-    def event_listener(self, event):
-        """Listen for new events and put them in the process queue."""
-        # Filer on entity_id
-        entity_id = event.data.get(ATTR_ENTITY_ID)
-        state = event.data.get("new_state")
-
-        if (
-            entity_id is not None
-            and state is not None
-            and state.state != STATE_UNKNOWN
-            and self.entity_filter(entity_id)
-        ):
-            self.queue.put(event)
-
     def insert(self):
+        shutdown_task = object()
+        hass_started = concurrent.futures.Future()
+
         @callback
         def register():
             """Post connection initialize."""
@@ -149,32 +138,65 @@ class QuestDB(threading.Thread):
 
         while True:
             event = self.queue.get()
-            try:
-                with Sender(self.host, self.port) as sender:
-                    # Record with provided designated timestamp (using the 'at' param)
-                    # Notice the designated timestamp is expected in Nanoseconds,
-                    # but timestamps in other columns are expected in Microseconds.
-                    # The API provides convenient functions
-                    entity_id = event.data["entity_id"]
-                    state = event.data.get("new_state")
-                    attrs = dict(state.attributes)
-                    sender.row(
-                        "qss",
-                        symbols={
-                            "entity_id": entity_id,
-                            "state": state,
-                            "attributes": attrs,
-                        },
-                        at=event.time_fired,
-                    )
 
-                    # We recommend flushing periodically, for example every few seconds.
-                    # If you don't flush explicitly, the client will flush automatically
-                    # once the buffer is reaches 63KiB and just before the connection
-                    # is closed.
-                    sender.flush()
-                    self.queue.task_done()
-
-            except IngressError as e:
-                sys.stderr.write(f"Got error: {e}\n")
+            if event is None:
                 self.queue.task_done()
+                return
+
+            tries = 1
+            updated = False
+            while not updated and tries <= 10:
+                if tries != 1:
+                    time.sleep(CONNECT_RETRY_WAIT)
+
+                try:
+                    with Sender(self.host, self.port) as sender:
+                        # Record with provided designated timestamp (using the 'at' param)
+                        # Notice the designated timestamp is expected in Nanoseconds,
+                        # but timestamps in other columns are expected in Microseconds.
+                        # The API provides convenient functions
+                        entity_id = event.data["entity_id"]
+                        state = event.data.get("new_state")
+                        attrs = dict(state.attributes)
+                        sender.row(
+                            "qss",
+                            symbols={
+                                "entity_id": entity_id,
+                                "state": state,
+                                "attributes": attrs,
+                            },
+                            at=event.time_fired,
+                        )
+
+                        # We recommend flushing periodically, for example every few seconds.
+                        # If you don't flush explicitly, the client will flush automatically
+                        # once the buffer is reaches 63KiB and just before the connection
+                        # is closed.
+                        sender.flush()
+
+                except IngressError as e:
+                    sys.stderr.write(f"Got error: {e}\n")
+
+            if not updated:
+                _LOGGER.error(
+                    "Error in database update. Could not save "
+                    "after %d tries. Giving up",
+                    tries,
+                )
+
+            self.queue.task_done()
+
+    @callback
+    def event_listener(self, event):
+        """Listen for new events and put them in the process queue."""
+        # Filer on entity_id
+        entity_id = event.data.get(ATTR_ENTITY_ID)
+        state = event.data.get("new_state")
+
+        if (
+            entity_id is not None
+            and state is not None
+            and state.state != STATE_UNKNOWN
+            and self.entity_filter(entity_id)
+        ):
+            self.queue.put(event)
