@@ -114,31 +114,65 @@ class QuestDB(threading.Thread):
             self.queue.put(event)
 
     def insert(self, event):
-        self.async_db_ready.set_result(True)
-        try:
-            with Sender(self.host, self.port) as sender:
-                # Record with provided designated timestamp (using the 'at' param)
-                # Notice the designated timestamp is expected in Nanoseconds,
-                # but timestamps in other columns are expected in Microseconds.
-                # The API provides convenient functions
-                entity_id = event.data["entity_id"]
-                state = event.data.get("new_state")
-                attrs = dict(state.attributes)
-                sender.row(
-                    "qss",
-                    symbols={
-                        "entity_id": entity_id,
-                        "state": state,
-                        "attributes": attrs,
-                    },
-                    at=event.time_fired,
+         @callback
+        def register():
+            """Post connection initialize."""
+            self.async_db_ready.set_result(True)
+
+            def shutdown(event):
+                """Shut down the ltss."""
+                if not hass_started.done():
+                    hass_started.set_result(shutdown_task)
+                self.queue.put(None)
+                self.join()
+
+            self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, shutdown)
+
+            if self.hass.state == CoreState.running:
+                hass_started.set_result(None)
+            else:
+
+                @callback
+                def notify_hass_started(event):
+                    """Notify that hass has started."""
+                    hass_started.set_result(None)
+
+                self.hass.bus.async_listen_once(
+                    EVENT_HOMEASSISTANT_START, notify_hass_started
                 )
 
-                # We recommend flushing periodically, for example every few seconds.
-                # If you don't flush explicitly, the client will flush automatically
-                # once the buffer is reaches 63KiB and just before the connection
-                # is closed.
-                sender.flush()
+        self.hass.add_job(register)
+        result = hass_started.result()
 
-        except IngressError as e:
-            sys.stderr.write(f"Got error: {e}\n")
+        while True:
+            event = self.queue.get()
+            try:
+                with Sender(self.host, self.port) as sender:
+                    # Record with provided designated timestamp (using the 'at' param)
+                    # Notice the designated timestamp is expected in Nanoseconds,
+                    # but timestamps in other columns are expected in Microseconds.
+                    # The API provides convenient functions
+                    entity_id = event.data["entity_id"]
+                    state = event.data.get("new_state")
+                    attrs = dict(state.attributes)
+                    sender.row(
+                        "qss",
+                        symbols={
+                            "entity_id": entity_id,
+                            "state": state,
+                            "attributes": attrs,
+                        },
+                        at=event.time_fired,
+                    )
+
+                    # We recommend flushing periodically, for example every few seconds.
+                    # If you don't flush explicitly, the client will flush automatically
+                    # once the buffer is reaches 63KiB and just before the connection
+                    # is closed.
+                    sender.flush()
+                    self.queue.task_done()
+
+            except IngressError as e:
+                sys.stderr.write(f"Got error: {e}\n")
+                self.queue.task_done()
+            
