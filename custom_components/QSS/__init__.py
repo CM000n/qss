@@ -114,6 +114,7 @@ class QuestDB(threading.Thread):
             self.queue.put(event)
 
     def insert(self, event):
+        self.async_db_ready.set_result(True)
         try:
             with Sender(self.host, self.port) as sender:
                 # Record with provided designated timestamp (using the 'at' param)
