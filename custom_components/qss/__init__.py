@@ -1,7 +1,6 @@
 """Support for recording details."""
 import asyncio
 import concurrent.futures
-from datetime import date, datetime
 from json import dumps
 import logging
 import queue
@@ -169,7 +168,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                                 "entity_id": entity_id,
                                 "state": state.state,
                                 "attributes": dumps(
-                                    attrs, sort_keys=True, indent=4, default=json_serial
+                                    attrs, sort_keys=True, indent=4, default=str
                                 ),
                             },
                             at=event.time_fired,
@@ -208,8 +207,3 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             and self.entity_filter(entity_id)
         ):
             self.queue.put(event)
-
-
-def json_serial(obj: Any) -> Any:
-    """JSON serializer for objects not serializable by default json code"""
-    return obj.isoformat() if isinstance(obj, (datetime, date)) else obj
