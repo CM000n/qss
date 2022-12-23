@@ -180,6 +180,7 @@ class QuestDB(threading.Thread):
                         "Error during data insert: %s",
                         err,
                     )
+                    tries += 1
 
             if not updated:
                 _LOGGER.error(
