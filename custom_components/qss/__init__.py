@@ -5,7 +5,7 @@ from json import dumps
 import logging
 import queue
 import threading
-from time import time
+from time import sleep
 from typing import Any, Callable
 
 from questdb import ingress as qdb
@@ -148,10 +148,6 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
 
         while True:
             event = self.queue.get()
-            _LOGGER.error(
-                "Event: %s",
-                event,
-            )
 
             if event is None:
                 _LOGGER.error(
@@ -165,7 +161,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             updated = False
             while not updated and tries <= 10:
                 if tries != 1:
-                    time.sleep(CONNECT_RETRY_WAIT)
+                    sleep(CONNECT_RETRY_WAIT)
 
                 try:
                     with qdb.Sender(self.host, self.port) as sender:
@@ -189,6 +185,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                         )
 
                         sender.flush()
+                        self.queue.task_done()
 
                 except qdb.IngressError as err:
                     _LOGGER.error(
