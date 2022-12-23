@@ -87,18 +87,23 @@ class QuestDB(threading.Thread):
         threading.Thread.__init__(self, name="QSS")
 
         self.hass = hass
-        self.queue: Any = queue.Queue()
-        self.async_db_ready = asyncio.Future()
         self.host = host
         self.port = port
         self.entity_filter = entity_filter
+
+        self.queue: Any = queue.Queue()
+        self.async_db_ready = asyncio.Future()
+
+        self.engine: Any = None
+        self.run_info: Any = None
+        self.get_session = None
 
     @callback
     def async_initialize(self):
         """Initialize QSS."""
         self.hass.bus.async_listen(EVENT_STATE_CHANGED, self.event_listener)
 
-    def insert(self):
+    def run(self):
         """Initialize QSS and Insert data."""
 
         tries = 1
