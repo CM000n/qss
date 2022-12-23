@@ -170,8 +170,8 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                             columns={
                                 "state": state.state,
                                 "attributes": dumps(
-                                    attrs, sort_keys=True, indent=1, default=str
-                                ),
+                                    attrs, sort_keys=True, default=str
+                                ).encode("utf-8"),
                             },
                             at=event.time_fired,
                         )
