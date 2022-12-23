@@ -131,10 +131,6 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         result = hass_started.result()
 
         if result is shutdown_task:
-            _LOGGER.info(
-                "Shutdown Task initialised: %s",
-                result,
-            )
             return
 
         while True:
