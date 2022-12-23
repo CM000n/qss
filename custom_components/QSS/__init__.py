@@ -3,7 +3,6 @@ import asyncio
 import concurrent.futures
 import logging
 import queue
-import sys
 import threading
 from time import time
 from typing import Any, Callable
@@ -123,7 +122,6 @@ class QuestDB(threading.Thread):
 
         self.hass.add_job(register)
         result = hass_started.result()
-        # If shutdown happened before Home Assistant finished starting
         if result is shutdown_task:
             return
 
@@ -154,11 +152,20 @@ class QuestDB(threading.Thread):
                             },
                             at=event.time_fired,
                         )
+                        _LOGGER.error(
+                            "entity_id: %s | state: %s | attributes: %s",
+                            entity_id,
+                            state,
+                            attrs,
+                        )
 
                         sender.flush()
 
-                except IngressError as e:
-                    sys.stderr.write(f"Got error: {e}\n")
+                except IngressError as err:
+                    _LOGGER.error(
+                        "Error during data insert: %s",
+                        err,
+                    )
 
             if not updated:
                 _LOGGER.error(
