@@ -53,6 +53,13 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     db_port = conf.get(CONF_PORT)
     entity_filter = convert_include_exclude_filter(conf)
 
+    _LOGGER.error(
+        "db_host: %s | db_port: %s | entity_filter: %s",
+        db_host,
+        db_port,
+        entity_filter,
+    )
+
     instance = QuestDB(
         hass=hass,
         host=db_host,
