@@ -166,6 +166,8 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                             "qss",
                             symbols={
                                 "entity_id": entity_id,
+                            },
+                            columns={
                                 "state": state.state,
                                 "attributes": dumps(
                                     attrs, sort_keys=True, indent=4, default=str
