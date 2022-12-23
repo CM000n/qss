@@ -63,7 +63,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     instance.async_initialize()
     instance.start()
 
-    return await instance.async_db_ready
+    return await instance.qss_ready
 
 
 class QuestDB(threading.Thread):  # pylint: disable = R0902
@@ -85,7 +85,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         self.entity_filter = entity_filter
 
         self.queue: Any = queue.Queue()
-        self.async_db_ready = asyncio.Future()
+        self.qss_ready = asyncio.Future()
 
         self.engine: Any = None
         self.run_info: Any = None
@@ -104,10 +104,10 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
 
         @callback
         def register():
-            """Post connection initialize."""
-            self.async_db_ready.set_result(True)
+            """Register qss to Home Assistant."""
+            self.qss_ready.set_result(True)
 
-            def shutdown(event):  # pylint: disable = W0613
+            def shutdown(event: Event):  # pylint: disable = W0613
                 """Shut down the qss."""
                 if not hass_started.done():
                     hass_started.set_result(shutdown_task)
@@ -121,7 +121,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             else:
 
                 @callback
-                def notify_hass_started(event):  # pylint: disable = W0613
+                def notify_hass_started(event: Event):  # pylint: disable = W0613
                     """Notify that hass has started."""
                     hass_started.set_result(None)
 
