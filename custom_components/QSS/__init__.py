@@ -71,7 +71,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     instance.async_initialize()
     instance.start()
 
-    return await instance.async_db_ready
+    return True
 
 
 class QuestDB(threading.Thread):
