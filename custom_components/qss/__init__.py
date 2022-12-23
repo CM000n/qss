@@ -1,6 +1,7 @@
 """Support for recording details."""
 import asyncio
 import concurrent.futures
+from datetime import date, datetime
 from json import dumps
 import logging
 import queue
@@ -53,13 +54,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     db_host = conf.get(CONF_HOST)
     db_port = conf.get(CONF_PORT)
     entity_filter = convert_include_exclude_filter(conf)
-
-    _LOGGER.error(
-        "db_host: %s | db_port: %s | entity_filter: %s",
-        db_host,
-        db_port,
-        entity_filter,
-    )
 
     instance = QuestDB(
         hass=hass,
@@ -168,18 +162,15 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                         entity_id = event.data["entity_id"]
                         state = event.data.get("new_state")
                         attrs = dict(state.attributes)
-                        _LOGGER.error(
-                            "entity_id: %s | state: %s | attributes: %s",
-                            entity_id,
-                            state.state,
-                            dumps(attrs),
-                        )
+
                         sender.row(
                             "qss",
                             symbols={
                                 "entity_id": entity_id,
                                 "state": state.state,
-                                "attributes": dumps(attrs),
+                                "attributes": dumps(
+                                    attrs, sort_keys=True, indent=4, default=json_serial
+                                ),
                             },
                             at=event.time_fired,
                         )
@@ -217,3 +208,8 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             and self.entity_filter(entity_id)
         ):
             self.queue.put(event)
+
+
+def json_serial(obj: Any) -> Any:
+    """JSON serializer for objects not serializable by default json code"""
+    return obj.isoformat() if isinstance(obj, (datetime, date)) else obj
