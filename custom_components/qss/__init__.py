@@ -1,7 +1,6 @@
 """Support for recording details."""
 import asyncio
 import concurrent.futures
-from json import dumps
 import logging
 import queue
 import threading
@@ -162,9 +161,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                             },
                             columns={
                                 "state": state.state,
-                                "attributes": dumps(
-                                    attrs, sort_keys=True, default=str
-                                ).encode("utf-8"),
+                                "attributes": attrs,
                             },
                             at=event.time_fired,
                         )
