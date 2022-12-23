@@ -162,7 +162,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                             },
                             columns={
                                 "state": state.state,
-                                "attributes": dumps(attrs),
+                                "attributes": dumps(attrs, sort_keys=True, default=str),
                             },
                             at=event.time_fired,
                         )
