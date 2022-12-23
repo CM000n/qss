@@ -185,7 +185,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                         )
 
                         sender.flush()
-                        self.queue.task_done()
+                    updated = True
 
                 except qdb.IngressError as err:
                     _LOGGER.error(
