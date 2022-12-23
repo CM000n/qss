@@ -1,6 +1,7 @@
 """Support for recording details."""
 import asyncio
 import concurrent.futures
+from json import dumps
 import logging
 import queue
 import threading
@@ -174,15 +175,15 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                         _LOGGER.error(
                             "entity_id: %s | state: %s | attributes: %s",
                             entity_id,
-                            state,
-                            attrs,
+                            state.state,
+                            dumps(attrs),
                         )
                         sender.row(
                             "qss",
                             symbols={
                                 "entity_id": entity_id,
-                                "state": str(state),
-                                "attributes": attrs,
+                                "state": state.state,
+                                "attributes": dumps(attrs),
                             },
                             at=event.time_fired,
                         )
