@@ -62,7 +62,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     instance.async_initialize()
     instance.start()
 
-    return True
+    return await instance.async_db_ready
 
 
 class QuestDB(threading.Thread):
@@ -125,6 +125,10 @@ class QuestDB(threading.Thread):
         self.hass.add_job(register)
         result = hass_started.result()
         if result is shutdown_task:
+            _LOGGER.error(
+                "Shutdown Task initialised: %s",
+                result,
+            )
             return
 
         while True:
@@ -135,6 +139,10 @@ class QuestDB(threading.Thread):
             )
 
             if event is None:
+                _LOGGER.error(
+                    "Event Data is None: %s",
+                    event,
+                )
                 self.queue.task_done()
                 return
 
