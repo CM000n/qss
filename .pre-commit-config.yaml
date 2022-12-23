@@ -20,7 +20,7 @@ repos:
         types: [python]
       - id: pylint
         name: pylint
-        entry: poetry run pylint
+        entry: poetry run pylint --extension-pkg-allow-list=questdb.ingress
         language: system
         types: [python]
         require_serial: true

@@ -10,7 +10,6 @@ from typing import Any, Callable
 from questdb import ingress as qdb
 import voluptuous as vol
 
-from homeassistant.components import persistent_notification
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     EVENT_HOMEASSISTANT_START,
@@ -73,7 +72,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     return await instance.async_db_ready
 
 
-class QuestDB(threading.Thread):
+class QuestDB(threading.Thread):  # pylint: disable = R0902
     """A threaded QSS class."""
 
     def __init__(
@@ -106,39 +105,6 @@ class QuestDB(threading.Thread):
     def run(self):
         """Initialize QSS and Insert data."""
 
-        tries = 1
-        connected = False
-
-        while not connected and tries <= 10:
-            if tries != 1:
-                time.sleep(CONNECT_RETRY_WAIT)
-            try:
-                self._setup_connection()
-                connected = True
-                _LOGGER.debug("Connected to ltss database")
-            except Exception as err:  # pylint: disable=broad-except
-                _LOGGER.error(
-                    "Error during connection setup: %s (retrying " "in %s seconds)",
-                    err,
-                    CONNECT_RETRY_WAIT,
-                )
-                tries += 1
-
-        if not connected:
-
-            @callback
-            def connection_failed():
-                """Connect failed tasks."""
-                self.async_db_ready.set_result(False)
-                persistent_notification.async_create(
-                    self.hass,
-                    "LTSS could not start, please check the log",
-                    "LTSS",
-                )
-
-            self.hass.add_job(connection_failed)
-            return
-
         shutdown_task = object()
         hass_started = concurrent.futures.Future()
 
@@ -147,7 +113,7 @@ class QuestDB(threading.Thread):
             """Post connection initialize."""
             self.async_db_ready.set_result(True)
 
-            def shutdown(event):
+            def shutdown(event):  # pylint: disable = W0613
                 """Shut down the ltss."""
                 if not hass_started.done():
                     hass_started.set_result(shutdown_task)
@@ -161,7 +127,7 @@ class QuestDB(threading.Thread):
             else:
 
                 @callback
-                def notify_hass_started(event):
+                def notify_hass_started(event):  # pylint: disable = W0613
                     """Notify that hass has started."""
                     hass_started.set_result(None)
 
@@ -191,7 +157,6 @@ class QuestDB(threading.Thread):
                     "Event Data is None: %s",
                     event,
                 )
-                self._close_connection()
                 self.queue.task_done()
                 return
 
@@ -254,27 +219,3 @@ class QuestDB(threading.Thread):
             and self.entity_filter(entity_id)
         ):
             self.queue.put(event)
-
-    def _setup_connection(self):
-        """Ensure database is ready to fly."""
-        try:
-            with qdb.Sender(self.host, self.port) as sender:
-                sender.connect()
-
-        except qdb.IngressError as err:
-            _LOGGER.error(
-                "Error during connecting to database: %s",
-                err,
-            )
-
-    def _close_connection(self):
-        """Close the connection."""
-        try:
-            with qdb.Sender(self.host, self.port) as sender:
-                sender.close()
-
-        except qdb.IngressError as err:
-            _LOGGER.error(
-                "Error during closing database connection: %s",
-                err,
-            )
