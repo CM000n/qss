@@ -26,12 +26,9 @@ from homeassistant.helpers.entityfilter import (
 )
 from homeassistant.helpers.typing import ConfigType
 
-_LOGGER = logging.getLogger(__name__)
+from .const import CONF_HOST, CONF_PORT, DOMAIN, RETRY_WAIT_SECONDS
 
-DOMAIN = "qss"
-CONF_HOST = "host"
-CONF_PORT = "port"
-CONNECT_RETRY_WAIT = 3
+_LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -154,7 +151,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             updated = False
             while not updated and tries <= 10:
                 if tries != 1:
-                    sleep(CONNECT_RETRY_WAIT)
+                    sleep(RETRY_WAIT_SECONDS)
 
                 try:
                     with qdb.Sender(self.host, self.port) as sender:
