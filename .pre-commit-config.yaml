@@ -1,27 +1,40 @@
 repos:
-  - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.9.2
-    hooks:
-      - id: isort
-  - repo: https://github.com/psf/black
-    rev: 22.3.0
-    hooks:
-      - id: black
-  - repo: https://github.com/PyCQA/flake8
-    rev: 3.8.4
-    hooks:
-      - id: flake8
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.3.0
+    rev: v3.4.0
     hooks:
+      - id: check-added-large-files
+      - id: check-yaml
       - id: check-json
         exclude: .devcontainer
       - id: check-merge-conflict
-      - id: check-yaml
-        exclude: .gitlab-ci.yml
       - id: debug-statements
       - id: end-of-file-fixer
+      - id: trailing-whitespace
       - id: requirements-txt-fixer
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: poetry run black
+        language: system
+        types: [python]
+      - id: pylint
+        name: pylint
+        entry: poetry run pylint
+        language: system
+        types: [python]
+        require_serial: true
+      - id: isort
+        name: isort
+        entry: poetry run isort
+        language: system
+        types: [python]
+        require_serial: true
+      - id: flake8
+        name: flake8
+        entry: poetry run flake8
+        language: system
+        types: [python]
   - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
     rev: 0.2.2
     hooks:
