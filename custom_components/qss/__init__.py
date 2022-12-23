@@ -1,14 +1,11 @@
 """Support for recording details."""
 import asyncio
 import concurrent.futures
-from json import dumps
 import logging
 import queue
 import threading
-from time import sleep
 from typing import Any, Callable
 
-from questdb import ingress as qdb
 import voluptuous as vol
 
 from homeassistant.const import (
@@ -24,12 +21,13 @@ from homeassistant.helpers.entityfilter import (
 )
 from homeassistant.helpers.typing import ConfigType
 
-from .const import CONF_HOST, CONF_PORT, DOMAIN, RETRY_WAIT_SECONDS
+from .const import CONF_HOST, CONF_PORT, DOMAIN
 from .event_handling import (
     finish_task_if_empty_event,
     get_event_from_queue,
     put_event_to_queue,
 )
+from .io import insert_event_data_into_questdb
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -142,49 +140,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         while True:
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
-
-            tries = 1
-            updated = False
-            while not updated and tries <= 10:
-                if tries != 1:
-                    sleep(RETRY_WAIT_SECONDS)
-
-                try:
-                    with qdb.Sender(self.host, self.port) as sender:
-                        entity_id = event.data["entity_id"]
-                        state = event.data.get("new_state")
-                        attrs = dict(state.attributes)
-
-                        sender.row(
-                            "qss",
-                            symbols={
-                                "entity_id": entity_id,
-                            },
-                            columns={
-                                "state": state.state,
-                                "attributes": dumps(attrs, sort_keys=True, default=str),
-                            },
-                            at=event.time_fired,
-                        )
-
-                        sender.flush()
-                    updated = True
-
-                except qdb.IngressError as err:
-                    _LOGGER.error(
-                        "Error during data insert: %s",
-                        err,
-                    )
-                    tries += 1
-
-            if not updated:
-                _LOGGER.error(
-                    "Error in database update. Could not save "
-                    "after %d tries. Giving up",
-                    tries,
-                )
-
-            self.queue.task_done()
+            insert_event_data_into_questdb(self.host, self.port, event, self.queue)
 
     @callback
     def event_listener(self, event: Event):
