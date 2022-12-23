@@ -12,13 +12,11 @@ from questdb import ingress as qdb
 import voluptuous as vol
 
 from homeassistant.const import (
-    ATTR_ENTITY_ID,
     EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STOP,
     EVENT_STATE_CHANGED,
-    STATE_UNKNOWN,
 )
-from homeassistant.core import CoreState, HomeAssistant, callback
+from homeassistant.core import CoreState, Event, HomeAssistant, callback
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entityfilter import (
     INCLUDE_EXCLUDE_BASE_FILTER_SCHEMA,
@@ -27,6 +25,11 @@ from homeassistant.helpers.entityfilter import (
 from homeassistant.helpers.typing import ConfigType
 
 from .const import CONF_HOST, CONF_PORT, DOMAIN, RETRY_WAIT_SECONDS
+from .event_handling import (
+    finish_task_if_empty_event,
+    get_event_from_queue,
+    put_event_to_queue,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -137,15 +140,8 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             return
 
         while True:
-            event = self.queue.get()
-
-            if event is None:
-                _LOGGER.error(
-                    "Event Data is None: %s",
-                    event,
-                )
-                self.queue.task_done()
-                return
+            event = get_event_from_queue(self.queue)
+            finish_task_if_empty_event(event, self.queue)
 
             tries = 1
             updated = False
@@ -193,16 +189,6 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             self.queue.task_done()
 
     @callback
-    def event_listener(self, event):
+    def event_listener(self, event: Event):
         """Listen for new events and put them in the process queue."""
-        # Filer on entity_id
-        entity_id = event.data.get(ATTR_ENTITY_ID)
-        state = event.data.get("new_state")
-
-        if (
-            entity_id is not None
-            and state is not None
-            and state.state != STATE_UNKNOWN
-            and self.entity_filter(entity_id)
-        ):
-            self.queue.put(event)
+        put_event_to_queue(event, self.entity_filter, self.queue)
