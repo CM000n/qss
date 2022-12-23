@@ -1,25 +1,17 @@
 """Support for recording details."""
 import asyncio
 import concurrent.futures
-import json
 import logging
 import queue
 import sys
 import threading
-from contextlib import contextmanager
-from datetime import datetime, timedelta
-from typing import Any, Callable, Dict, Optional
+from time import time
+from typing import Any, Callable
 
 import homeassistant.helpers.config_validation as cv
-import homeassistant.util.dt as dt_util
 import voluptuous as vol
-from homeassistant.components import persistent_notification
 from homeassistant.const import (
     ATTR_ENTITY_ID,
-    CONF_DOMAINS,
-    CONF_ENTITIES,
-    CONF_EXCLUDE,
-    CONF_INCLUDE,
     EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STOP,
     EVENT_STATE_CHANGED,
@@ -30,7 +22,6 @@ from homeassistant.helpers.entityfilter import (
     INCLUDE_EXCLUDE_BASE_FILTER_SCHEMA,
     convert_include_exclude_filter,
 )
-from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.typing import ConfigType
 from questdb.ingress import IngressError, Sender
 
@@ -151,10 +142,6 @@ class QuestDB(threading.Thread):
 
                 try:
                     with Sender(self.host, self.port) as sender:
-                        # Record with provided designated timestamp (using the 'at' param)
-                        # Notice the designated timestamp is expected in Nanoseconds,
-                        # but timestamps in other columns are expected in Microseconds.
-                        # The API provides convenient functions
                         entity_id = event.data["entity_id"]
                         state = event.data.get("new_state")
                         attrs = dict(state.attributes)
@@ -168,10 +155,6 @@ class QuestDB(threading.Thread):
                             at=event.time_fired,
                         )
 
-                        # We recommend flushing periodically, for example every few seconds.
-                        # If you don't flush explicitly, the client will flush automatically
-                        # once the buffer is reaches 63KiB and just before the connection
-                        # is closed.
                         sender.flush()
 
                 except IngressError as e:
