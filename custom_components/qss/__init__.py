@@ -142,7 +142,7 @@ class QuestDB(threading.Thread):
             """Post connection initialize."""
             self.async_db_ready.set_result(True)
 
-            def shutdown():
+            def shutdown(event):
                 """Shut down the ltss."""
                 if not hass_started.done():
                     hass_started.set_result(shutdown_task)
@@ -156,7 +156,7 @@ class QuestDB(threading.Thread):
             else:
 
                 @callback
-                def notify_hass_started():
+                def notify_hass_started(event):
                     """Notify that hass has started."""
                     hass_started.set_result(None)
 
@@ -166,6 +166,7 @@ class QuestDB(threading.Thread):
 
         self.hass.add_job(register)
         result = hass_started.result()
+
         if result is shutdown_task:
             _LOGGER.error(
                 "Shutdown Task initialised: %s",
