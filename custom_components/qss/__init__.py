@@ -169,7 +169,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                 try:
                     with qdb.Sender(self.host, self.port) as sender:
                         entity_id = event.data["entity_id"]
-                        state = event.data.get("new_state")
+                        state = event.data.get("new_state").str.encode("utf-8")
                         attrs = dict(state.attributes)
                         sender.row(
                             "qss",
