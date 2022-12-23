@@ -44,7 +44,7 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up QSS."""
+    """Set up qss."""
     conf = config[DOMAIN]
 
     db_host = conf.get(CONF_HOST)
@@ -64,7 +64,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 
 class QuestDB(threading.Thread):  # pylint: disable = R0902
-    """A threaded QSS class."""
+    """A threaded qss class."""
 
     def __init__(
         self,
@@ -73,7 +73,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         port: int,
         entity_filter: Callable[[str], bool],
     ) -> None:
-        """Initialize QSS."""
+        """Initialize qss."""
         threading.Thread.__init__(self, name="QSS")
 
         self.hass = hass
@@ -90,11 +90,11 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
 
     @callback
     def async_initialize(self):
-        """Initialize QSS."""
+        """Initialize qss."""
         self.hass.bus.async_listen(EVENT_STATE_CHANGED, self.event_listener)
 
     def run(self):
-        """Initialize QSS and Insert data."""
+        """Initialize qss and Insert data."""
 
         shutdown_task = object()
         hass_started = concurrent.futures.Future()
@@ -105,7 +105,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             self.async_db_ready.set_result(True)
 
             def shutdown(event):  # pylint: disable = W0613
-                """Shut down the ltss."""
+                """Shut down the qss."""
                 if not hass_started.done():
                     hass_started.set_result(shutdown_task)
                 self.queue.put(None)
@@ -130,7 +130,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         result = hass_started.result()
 
         if result is shutdown_task:
-            _LOGGER.error(
+            _LOGGER.info(
                 "Shutdown Task initialised: %s",
                 result,
             )
