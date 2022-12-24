@@ -2,13 +2,13 @@
 from json import dumps
 import logging
 from queue import Queue
-from time import sleep
 
 from questdb.ingress import IngressError, Sender
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 from homeassistant.core import Event
 
-from .const import RETRY_WAIT_SECONDS
+from .const import RETRY_ATTEMPTS, RETRY_WAIT_SECONDS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,29 +33,25 @@ def _insert_row(host: str, port: int, event: Event) -> None:
         sender.flush()
 
 
+@retry(
+    retry=retry_if_exception_type(IngressError),
+    stop=stop_after_attempt(RETRY_ATTEMPTS),
+    wait=wait_fixed(RETRY_WAIT_SECONDS),
+)
+def _retry_data_insertion(host: str, port: int, event: Event) -> None:
+    """Usign a retry for inserting event data into QuestDB."""
+    _insert_row(host, port, event)
+    raise RuntimeError(
+        _LOGGER.error(
+            "Error in database update. Could not save after %s retries. Giving up",
+            RETRY_ATTEMPTS,
+        )
+    )
+
+
 def insert_event_data_into_questdb(
     host: str, port: int, event: Event, queue: Queue
 ) -> None:
     """Inserting given event data into QuestDB."""
-    tries = 1
-    updated = False
-    while not updated and tries <= 10:
-        if tries != 1:
-            sleep(RETRY_WAIT_SECONDS)
-        try:
-            _insert_row(host, port, event)
-            updated = True
-        except IngressError as err:
-            _LOGGER.error(
-                "Error during data insert: %s",
-                err,
-            )
-            tries += 1
-
-    if not updated:
-        _LOGGER.error(
-            "Error in database update. Could not save after %s tries. Giving up",
-            tries,
-        )
-
+    _retry_data_insertion(host, port, event)
     queue.task_done()
