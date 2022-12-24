@@ -34,19 +34,13 @@ def _insert_row(host: str, port: int, event: Event) -> None:
 
 
 @retry(
-    retry=retry_if_exception_type(IngressError),
     stop=stop_after_attempt(RETRY_ATTEMPTS),
     wait=wait_fixed(RETRY_WAIT_SECONDS),
+    retry=retry_if_exception_type(IngressError),
 )
 def _retry_data_insertion(host: str, port: int, event: Event) -> None:
     """Usign a retry for inserting event data into QuestDB."""
     _insert_row(host, port, event)
-    raise RuntimeError(
-        _LOGGER.error(
-            "Error in database update. Could not save after %s retries. Giving up",
-            RETRY_ATTEMPTS,
-        )
-    )
 
 
 def insert_event_data_into_questdb(
