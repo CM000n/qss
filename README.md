@@ -100,8 +100,10 @@ The data is stored in a QuestDB table named ``qss``, which has the following str
 | Type:        | symbol    | string | string     | timestamps |
 
 ## Credits
-QSS was largely inspired by and based on [LTSS (Long Time State Storage)](https://github.com/freol35241/ltss) by [freol35241](https://github.com/freol35241). Many thanks to [freol35241](https://github.com/freol35241) for his great work!
+* First of all, thanks to all the contributors to the great [QuestDB project](https://github.com/questdb/questdb). Without their work, this custom component would never have been created.
+* QSS was largely inspired by and based on [LTSS (Long Time State Storage)](https://github.com/freol35241/ltss) by [freol35241](https://github.com/freol35241). Many thanks to [freol35241](https://github.com/freol35241) for his great work!
+
 
 ## Disclaimer
-* QSS is not an official extension of the QuestDB project and is not directly related to it.
+* QSS is not an official extension of the [QuestDB project](https://github.com/questdb/questdb) and is not directly related to it.
 * No liability is accepted for any loss of data that may occur through the use of QSS. Use at your own risk!
