@@ -64,15 +64,15 @@ Enables the qss integration. Only allowed once.
   Configure which integrations should be excluded from recordings.
 
     domains:
-    (list)(Optional)
+    (List[str])(Optional)
     The list of domains to be excluded from recordings.
 
     entities:
-    (list)(Optional)
+    (List[str])(Optional)
     The list of entity ids to be excluded from recordings.
 
     entity_globs:
-    (list)(Optional)
+    (List[str])(Optional)
     Exclude all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
 
   include:
@@ -80,15 +80,15 @@ Enables the qss integration. Only allowed once.
   Configure which integrations should be included in recordings. If set, all other entities will not be recorded.
 
     domains:
-    (list)(Optional)
+    (List[str])(Optional)
     The list of domains to be included in the recordings.
 
     entities:
-    (list)(Optional)
+    (List[str])(Optional)
     The list of entity ids to be included in the recordings.
 
     entity_globs:
-    (list)(Optional)
+    (List[str])(Optional)
     Include all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
 ```
 
