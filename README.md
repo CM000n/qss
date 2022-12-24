@@ -33,60 +33,64 @@ Automatic:
 configuration.yaml
 * Add an entry to your Home Assistant ```configuration.yaml``` that might look like this::
 
-        qss:
-            host: 192.168.178.3
-            port: 9009
-            include:
-                domains:
-                  - sensor
-                entities:
-                  - person.john_doe
+```yaml
+qss:
+    host: 192.168.178.3
+    port: 9009
+    include:
+      domains:
+        - sensor
+      entities:
+        - person.john_doe
+```
 
 ## Configuration
 
-    qss
-    (map)(Required)
-    Enables the qss integration. Only allowed once.
+```yaml
+qss:
+(map)(Required)
+Enables the qss integration. Only allowed once.
 
-        host
-        (string)(Required)
-        The URL or IP Address that points to your QuestDB database.
+  host:
+  (string)(Required)
+  The URL or IP Address that points to your QuestDB database.
 
-        port
-        (int)(Required)
-        The port to the InfluxDB line protocol of your QuestDB installation. This is normally 9009 by default.
+  port:
+  (int)(Required)
+  The port to the InfluxDB line protocol of your QuestDB installation. This is normally 9009 by default.
 
-        exclude
-        (map)(Optional)
-        Configure which integrations should be excluded from recordings.
+  exclude:
+  (map)(Optional)
+  Configure which integrations should be excluded from recordings.
 
-            domains
-            (list)(Optional)
-            The list of domains to be excluded from recordings.
+    domains:
+    (list)(Optional)
+    The list of domains to be excluded from recordings.
 
-            entities
-            (list)(Optional)
-            The list of entity ids to be excluded from recordings.
+    entities:
+    (list)(Optional)
+    The list of entity ids to be excluded from recordings.
 
-            entity_globs:
-            (list)(Optional)
-            Exclude all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
+    entity_globs:
+    (list)(Optional)
+    Exclude all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
 
-        include
-        (map)(Optional)
-        Configure which integrations should be included in recordings. If set, all other entities will not be recorded.
+  include:
+  (map)(Optional)
+  Configure which integrations should be included in recordings. If set, all other entities will not be recorded.
 
-            domains
-            (list)(Optional)
-            The list of domains to be included in the recordings.
+    domains:
+    (list)(Optional)
+    The list of domains to be included in the recordings.
 
-            entities
-            (list)(Optional)
-            The list of entity ids to be included in the recordings.
+    entities:
+    (list)(Optional)
+    The list of entity ids to be included in the recordings.
 
-            entity_globs:
-            (list)(Optional)
-            Include all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
+    entity_globs:
+    (list)(Optional)
+    Include all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
+```
 
 ## Details
 The data is stored in a QuestDB table named ``qss``, which has the following structure:
