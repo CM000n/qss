@@ -35,13 +35,13 @@ configuration.yaml
 
 ```yaml
 qss:
-    host: 192.168.178.3
-    port: 9009
-    include:
-      domains:
-        - sensor
-      entities:
-        - person.john_doe
+  host: 192.168.178.3
+  port: 9009
+  include:
+    domains:
+      - sensor
+    entities:
+      - person.john_doe
 ```
 
 ## Configuration
