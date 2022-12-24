@@ -1,3 +1,7 @@
+<div align="center">
+  <a href="https://questdb.io/" target="blank"><img alt="QuestDB Logo" src="https://questdb.io/img/questdb-logo-themed.svg" width="305px"/></a>
+</div>
+
 QuestDB state storage (QSS) custom component for Home Assistant
 ========================================
 
@@ -50,7 +54,7 @@ configuration.yaml
 
         port
         (int)(Required)
-        The port to the InfluxDB line protocol of your QuestDB installation. This is normally 9009 by default..
+        The port to the InfluxDB line protocol of your QuestDB installation. This is normally 9009 by default.
 
         exclude
         (map)(Optional)
@@ -93,3 +97,7 @@ The data is stored in a QuestDB table named ``qss``, which has the following str
 
 ## Credits
 QSS was largely inspired by and based on [LTSS (Long Time State Storage)](https://github.com/freol35241/ltss) by [freol35241](https://github.com/freol35241). Many thanks to [freol35241](https://github.com/freol35241) for his great work!
+
+## Disclaimer
+* QSS is not an official extension of the QuestDB project and is not directly related to it.
+* No liability is accepted for any loss of data that may occur through the use of QSS. Use at your own risk!
