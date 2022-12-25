@@ -1,4 +1,4 @@
-name: Draft a release note
+name: Draft release note
 
 on:
   push:
