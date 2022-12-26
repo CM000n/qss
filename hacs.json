@@ -1,4 +1,6 @@
 {
-    "name": "QSS",
-    "iot_class": "Local Polling"
+    "name": "QuestDB State Storage (QSS)",
+    "hide_default_branch": true,
+    "hacs": "1.6.0",
+    "homeassistant": "2022.12.0"
 }
