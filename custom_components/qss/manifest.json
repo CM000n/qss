@@ -9,6 +9,7 @@
         "tenacity>=5.0,<6.0"
     ],
     "dependencies": [],
+    "iot_class": "local_push",
     "codeowners": [
         "@CM000n"
     ]
