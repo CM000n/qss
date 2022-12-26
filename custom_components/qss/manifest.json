@@ -1,13 +1,15 @@
 {
     "domain": "qss",
-    "version": "0.0.1",
+    "version": "0",
     "name": "QuestDB State Storage (QSS)",
     "documentation": "https://github.com/CM000n/QSS",
+    "issue_tracker": "https://github.com/CM000n/QSS/issues",
     "requirements": [
         "questdb>=1.0,<2.0",
         "tenacity>=5.0,<6.0"
     ],
     "dependencies": [],
+    "iot_class": "local_push",
     "codeowners": [
         "@CM000n"
     ]
