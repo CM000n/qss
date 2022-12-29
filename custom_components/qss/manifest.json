@@ -1,6 +1,6 @@
 {
     "domain": "qss",
-    "version": "0",
+    "version": "0.0.1",
     "name": "QuestDB State Storage (QSS)",
     "documentation": "https://github.com/CM000n/QSS",
     "issue_tracker": "https://github.com/CM000n/QSS/issues",
