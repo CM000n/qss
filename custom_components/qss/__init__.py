@@ -117,7 +117,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         self.hass.bus.async_listen(EVENT_STATE_CHANGED, self.event_listener)
 
     def run(self):
-        """Initialize qss and Insert data."""
+        """Run qss and insert data."""
 
         shutdown_task = object()
         hass_started = concurrent.futures.Future()
