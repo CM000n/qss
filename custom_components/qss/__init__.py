@@ -111,10 +111,6 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         self.queue: Any = queue.Queue()
         self.qss_ready = asyncio.Future()
 
-        self.engine: Any = None
-        self.run_info: Any = None
-        self.get_session = None
-
     @callback
     def async_initialize(self):
         """Initialize qss."""
