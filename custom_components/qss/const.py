@@ -7,10 +7,11 @@ ISSUES_URL = "https://github.com/CM000n/qss/issues"
 CONF_HOST = "host"
 CONF_PORT = "port"
 
-CONF_AUTH_KID = "auth_kid"
-CONF_AUTH_D_KEY = "auth_d_key"
-CONF_AUTH_X_KEY = "auth_x_key"
-CONF_AUTH_Y_KEY = "auth_y_key"
+CONF_AUTH = "authentication"
+CONF_AUTH_KID = "kid"
+CONF_AUTH_D_KEY = "d_key"
+CONF_AUTH_X_KEY = "x_key"
+CONF_AUTH_Y_KEY = "y_key"
 
 RETRY_WAIT_SECONDS = 5
 RETRY_ATTEMPTS = 10

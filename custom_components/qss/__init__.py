@@ -20,7 +20,16 @@ from homeassistant.helpers.entityfilter import (
 )
 from homeassistant.helpers.typing import ConfigType
 
-from .const import CONF_HOST, CONF_PORT, DOMAIN
+from .const import (
+    CONF_AUTH,
+    CONF_AUTH_D_KEY,
+    CONF_AUTH_KID,
+    CONF_AUTH_X_KEY,
+    CONF_AUTH_Y_KEY,
+    CONF_HOST,
+    CONF_PORT,
+    DOMAIN,
+)
 from .event_handling import (
     finish_task_if_empty_event,
     get_event_from_queue,
@@ -30,12 +39,23 @@ from .io import insert_event_data_into_questdb
 
 _LOGGER = logging.getLogger(__name__)
 
+AUTHENTICATION_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_AUTH_KID, default=None): cv.string,
+        vol.Optional(CONF_AUTH_D_KEY, default=None): cv.string,
+        vol.Optional(CONF_AUTH_X_KEY, default=None): cv.string,
+        vol.Optional(CONF_AUTH_Y_KEY, default=None): cv.string,
+    }
+)
+
+
 CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: INCLUDE_EXCLUDE_BASE_FILTER_SCHEMA.extend(
             {
                 vol.Required(CONF_HOST): cv.string,
                 vol.Required(CONF_PORT): cv.positive_int,
+                vol.Optional(CONF_AUTH, default=None): AUTHENTICATION_SCHEMA,
             }
         )
     },
