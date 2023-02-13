@@ -106,6 +106,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         self.host = host
         self.port = port
         self.entity_filter = entity_filter
+        self.auth = auth
 
         self.queue: Any = queue.Queue()
         self.qss_ready = asyncio.Future()
@@ -161,7 +162,9 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         while True:
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
-            insert_event_data_into_questdb(self.host, self.port, event, self.queue)
+            insert_event_data_into_questdb(
+                self.host, self.port, self.auth, event, self.queue
+            )
 
     @callback
     def event_listener(self, event: Event):
