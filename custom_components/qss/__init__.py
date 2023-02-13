@@ -73,16 +73,14 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     entity_filter = convert_include_exclude_filter(conf)
 
-    conf.get(CONF_AUTH).get(CONF_AUTH_KID)
-    conf.get(CONF_AUTH).get(CONF_AUTH_D_KEY)
-    conf.get(CONF_AUTH).get(CONF_AUTH_X_KEY)
-    conf.get(CONF_AUTH).get(CONF_AUTH_Y_KEY)
+    auth_kid = conf.get(CONF_AUTH).get(CONF_AUTH_KID)
+    auth_d_key = conf.get(CONF_AUTH).get(CONF_AUTH_D_KEY)
+    auth_x_key = conf.get(CONF_AUTH).get(CONF_AUTH_X_KEY)
+    auth_y_key = conf.get(CONF_AUTH).get(CONF_AUTH_Y_KEY)
+    db_auth = (auth_kid, auth_d_key, auth_x_key, auth_y_key)
 
     instance = QuestDB(
-        hass=hass,
-        host=db_host,
-        port=db_port,
-        entity_filter=entity_filter,
+        hass=hass, host=db_host, port=db_port, entity_filter=entity_filter, auth=db_auth
     )
     instance.async_initialize()
     instance.start()
@@ -99,6 +97,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         host: str,
         port: int,
         entity_filter: Callable[[str], bool],
+        auth: tuple,
     ) -> None:
         """Initialize qss."""
         threading.Thread.__init__(self, name="QSS")
