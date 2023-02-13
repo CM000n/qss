@@ -38,4 +38,4 @@ select = [
     "I002"
 ]
 line-length = 88
-fix = true
+fix = false

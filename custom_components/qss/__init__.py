@@ -39,12 +39,13 @@ from .io import insert_event_data_into_questdb
 
 _LOGGER = logging.getLogger(__name__)
 
+
 AUTHENTICATION_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_AUTH_KID, default=None): cv.string,
-        vol.Optional(CONF_AUTH_D_KEY, default=None): cv.string,
-        vol.Optional(CONF_AUTH_X_KEY, default=None): cv.string,
-        vol.Optional(CONF_AUTH_Y_KEY, default=None): cv.string,
+        vol.Required(CONF_AUTH_KID, default=None): cv.string,
+        vol.Required(CONF_AUTH_D_KEY, default=None): cv.string,
+        vol.Required(CONF_AUTH_X_KEY, default=None): cv.string,
+        vol.Required(CONF_AUTH_Y_KEY, default=None): cv.string,
     }
 )
 
@@ -55,7 +56,7 @@ CONFIG_SCHEMA = vol.Schema(
             {
                 vol.Required(CONF_HOST): cv.string,
                 vol.Required(CONF_PORT): cv.positive_int,
-                vol.Optional(CONF_AUTH, default=None): AUTHENTICATION_SCHEMA,
+                vol.Optional(CONF_AUTH, default={}): AUTHENTICATION_SCHEMA,
             }
         )
     },
@@ -69,7 +70,13 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     db_host = conf.get(CONF_HOST)
     db_port = conf.get(CONF_PORT)
+
     entity_filter = convert_include_exclude_filter(conf)
+
+    conf.get(CONF_AUTH).get(CONF_AUTH_KID)
+    conf.get(CONF_AUTH).get(CONF_AUTH_D_KEY)
+    conf.get(CONF_AUTH).get(CONF_AUTH_X_KEY)
+    conf.get(CONF_AUTH).get(CONF_AUTH_Y_KEY)
 
     instance = QuestDB(
         hass=hass,
