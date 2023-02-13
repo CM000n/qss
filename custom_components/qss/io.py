@@ -1,12 +1,11 @@
 """Helper functions for IO operations on QuestDB."""
-from json import dumps
 import logging
+from json import dumps
 from queue import Queue
 
+from homeassistant.core import Event
 from questdb.ingress import IngressError, Sender
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
-
-from homeassistant.core import Event
 
 from .const import RETRY_ATTEMPTS, RETRY_WAIT_SECONDS
 

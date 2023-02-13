@@ -6,15 +6,14 @@ import queue
 import threading
 from typing import Any, Callable
 
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-
 from homeassistant.const import (
     EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STOP,
     EVENT_STATE_CHANGED,
 )
 from homeassistant.core import CoreState, Event, HomeAssistant, callback
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entityfilter import (
     INCLUDE_EXCLUDE_BASE_FILTER_SCHEMA,
     convert_include_exclude_filter,

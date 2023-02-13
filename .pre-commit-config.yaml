@@ -10,6 +10,11 @@ repos:
       - id: debug-statements
       - id: end-of-file-fixer
       - id: trailing-whitespace
+  - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+    rev: 0.2.2
+    hooks:
+      - id: yamlfmt
+        args: [--mapping, '2', --sequence, '4', --offset, '2', --width, '120', --implicit_start]
   - repo: local
     hooks:
       - id: black
@@ -17,25 +22,9 @@ repos:
         entry: poetry run black
         language: system
         types: [python]
-      - id: pylint
-        name: pylint
-        entry: poetry run pylint --extension-pkg-allow-list=questdb.ingress
-        language: system
-        types: [python]
         require_serial: true
-      - id: isort
-        name: isort
-        entry: poetry run isort
+      - id: ruff
+        name: ruff
+        entry: poetry run ruff
         language: system
         types: [python]
-        require_serial: true
-      - id: flake8
-        name: flake8
-        entry: poetry run flake8
-        language: system
-        types: [python]
-  - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 0.2.2
-    hooks:
-      - id: yamlfmt
-        args: [--mapping, '2', --sequence, '4', --offset, '2', --width, '120', --implicit_start]
