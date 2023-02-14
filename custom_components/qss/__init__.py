@@ -42,10 +42,10 @@ _LOGGER = logging.getLogger(__name__)
 
 AUTHENTICATION_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_AUTH_KID, default=None): cv.string,
-        vol.Required(CONF_AUTH_D_KEY, default=None): cv.string,
-        vol.Required(CONF_AUTH_X_KEY, default=None): cv.string,
-        vol.Required(CONF_AUTH_Y_KEY, default=None): cv.string,
+        vol.Required(CONF_AUTH_KID, default=""): cv.string,
+        vol.Required(CONF_AUTH_D_KEY, default=""): cv.string,
+        vol.Required(CONF_AUTH_X_KEY, default=""): cv.string,
+        vol.Required(CONF_AUTH_Y_KEY, default=""): cv.string,
     }
 )
 
