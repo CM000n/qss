@@ -37,12 +37,19 @@ configuration.yaml
 qss:
   host: "192.168.178.3"
   port: 9009
+  authentication:
+    kid: "your_kid"
+    d_key: "your_d_key"
+    x_key: "your_x_key"
+    y_key: "your_y_key"
   include:
     domains:
       - "sensor"
     entities:
       - "person.john_doe"
 ```
+Note: Authenication details are completely optional. How to create them can be found in the Quest DB documentation at this point:
+https://questdb.io/docs/reference/api/ilp/authenticate
 
 ## Configuration
 
@@ -58,6 +65,26 @@ Enables the qss integration. Only allowed once.
   port:
   (int)(Required)
   The port to the InfluxDB line protocol of your QuestDB installation. This is normally 9009 by default.
+
+  authentication:
+  (dict)(Optional)
+  Under this entry you can, if desired, enter the authenication parameters necessary for your Quest DB installation. The entry is completely optional if your Quest DB installation does not have any additional authentication settings.
+
+    kid:
+    (string)(Required)
+    Your authentication kid.
+
+    d_key: "your_d_key"
+    (string)(Required)
+    Your authentication D Key.
+
+    x_key: "your_x_key"
+    (string)(Required)
+    Your authentication X Key.
+
+    y_key: "your_y_key"
+    (string)(Required)
+    Your authentication Y Key.
 
   exclude:
   (map)(Optional)
