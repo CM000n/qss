@@ -52,12 +52,8 @@ def _insert_row_without_auth(host: str, port: int, event: Event) -> None:
         sender.flush()
 
 
-def _check_all_auth_values_exist(auth: tuple) -> bool:
-    return auth.count(None) <= 0
-
-
 def _insert_row(host: str, port: int, auth: tuple, event: Event) -> None:
-    if _check_all_auth_values_exist(auth) is True:
+    if all(auth):
         _insert_row_with_auth(host, port, auth, event)
     else:
         _insert_row_without_auth(host, port, event)
