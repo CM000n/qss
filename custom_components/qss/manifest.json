@@ -10,7 +10,7 @@
     "issue_tracker": "https://github.com/CM000n/QSS/issues",
     "requirements": [
         "questdb>=1.0,<2.0",
-        "tenacity>=5.0,<6.0"
+        "tenacity>=8.0"
     ],
     "version": "0.0.1"
 }
