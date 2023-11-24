@@ -12,5 +12,5 @@
         "questdb>=1.0,<2.0",
         "tenacity>=8.0"
     ],
-    "version": "0.0.1"
+    "version": "v0.0.6"
 }

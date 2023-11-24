@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qss"
-version = "0.0.5"
+version = "v0.0.6"
 description = "QuestDB State Storage (QSS) for Home Assistant"
 license = "MIT"
 readme = "README.md"
@@ -9,15 +9,15 @@ authors = ["CM000n"]
 
 [tool.poetry.dependencies]
 python = "^3.10.0"
-homeassistant = "^2023.6"
 questdb = "^1.0.2"
 tenacity = "^8.0.0"
 
 
 [tool.poetry.dev-dependencies]
+homeassistant = "^2023.6"
 pre-commit = "^2.21.0"
 black = "^22.12.0"
-ruff = "^0.0.246"
+ruff = "^0.1.6"
 
 
 [build-system]

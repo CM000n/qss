@@ -2,18 +2,18 @@
 
 ## Supported Versions
 
-We provide security updates for the current major release of our software and, in certain cases, for the previous major release as well. 
+We provide security updates for the current major release of our software and, in certain cases, for the previous major release as well.
 It is recommended to always use the latest stable version to benefit from the latest security enhancements.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.0.6   | :white_check_mark: |
+| v0.0.6  | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
-At qss, we take security seriously. 
-We appreciate your efforts in helping us maintain the security and integrity of our software. 
-If you discover any security vulnerabilities or concerns, please report them by oben a new issue at https://github.com/CM000n/qss/issues.
+At qss, we take security seriously.
+We appreciate your efforts in helping us maintain the security and integrity of our software.
+If you discover any security vulnerabilities or concerns, please report them by oben a new issue at <https://github.com/CM000n/qss/issues>.
 
 When reporting a security issue, please include the following details:
 
