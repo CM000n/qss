@@ -2,20 +2,22 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+We provide security updates for the current major release of our software and, in certain cases, for the previous major release as well. 
+It is recommended to always use the latest stable version to benefit from the latest security enhancements.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| 0.0.6   | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+At qss, we take security seriously. 
+We appreciate your efforts in helping us maintain the security and integrity of our software. 
+If you discover any security vulnerabilities or concerns, please report them by oben a new issue at https://github.com/CM000n/qss/issues.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+When reporting a security issue, please include the following details:
+
+Description of the issue, including steps to reproduce and potential impact
+Any relevant technical information or documentation
+Your contact information for communication and follow-up
+We strive to respond to all reported security issues in a timely manner. We kindly request that you do not publicly disclose any vulnerabilities until we have had sufficient time to investigate and address them.
