@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qss"
-version = "v0.0.6"
+version = "v0.0.7"
 description = "QuestDB State Storage (QSS) for Home Assistant"
 license = "MIT"
 readme = "README.md"
