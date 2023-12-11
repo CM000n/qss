@@ -30,4 +30,3 @@ def finish_task_if_empty_event(event: Event, queue: Queue) -> None:
     """Finish process queue task in case of no events."""
     if event is None:
         queue.task_done()
-        return
