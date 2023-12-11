@@ -17,14 +17,19 @@ repos:
         args: [--mapping, '2', --sequence, '4', --offset, '2', --width, '120', --implicit_start]
   - repo: local
     hooks:
-      - id: black
-        name: black
-        entry: poetry run black
+      - id: codespell
+        name: codespell
+        entry: poetry run codespell --write-changes --skip="./*"
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ruff format
+        name: ruff format
+        entry: poetry run ruff format
         language: system
         types: [python]
-        require_serial: true
-      - id: ruff
-        name: ruff
+      - id: ruff lint
+        name: ruff lint
         entry: poetry run ruff
         language: system
         types: [python]

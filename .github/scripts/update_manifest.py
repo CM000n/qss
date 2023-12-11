@@ -16,7 +16,7 @@ def update_manifest():
 
     version_striped = version.replace("v", "")
 
-    print(f"Version number being inserted: {str(version_striped)}")
+    print(f"Version number being inserted: {version_striped!s}")
 
     print("Opening file...")
 
@@ -30,9 +30,7 @@ def update_manifest():
 
     print("Saving file...")
 
-    with open(
-        f"{os.getcwd()}/custom_components/qss/manifest.json", "w"
-    ) as manifestfile:
+    with open(f"{os.getcwd()}/custom_components/qss/manifest.json", "w") as manifestfile:
         manifestfile.write(json.dumps(manifest, indent=4, sort_keys=True))
 
     print("Done!")
