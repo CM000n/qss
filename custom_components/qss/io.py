@@ -12,51 +12,25 @@ from .const import RETRY_ATTEMPTS, RETRY_WAIT_SECONDS
 _LOGGER = logging.getLogger(__name__)
 
 
-def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event) -> None:
-    with Sender(host, port, auth=auth, tls=True) as sender:
-        entity_id = event.data["entity_id"]
-        state = event.data.get("new_state")
-        attrs = dict(state.attributes)
-        sender.row(
-            "qss",
-            symbols={
-                "entity_id": entity_id,
-            },
-            columns={
-                "state": state.state,
-                "attributes": dumps(attrs, sort_keys=True, default=str),
-            },
-            at=event.time_fired,
-        )
-
-        sender.flush()
-
-
-def _insert_row_without_auth(host: str, port: int, event: Event) -> None:
-    with Sender(host, port) as sender:
-        entity_id = event.data["entity_id"]
-        state = event.data.get("new_state")
-        attrs = dict(state.attributes)
-        sender.row(
-            "qss",
-            symbols={
-                "entity_id": entity_id,
-            },
-            columns={
-                "state": state.state,
-                "attributes": dumps(attrs, sort_keys=True, default=str),
-            },
-            at=event.time_fired,
-        )
-
-        sender.flush()
-
-
 def _insert_row(host: str, port: int, auth: tuple, event: Event) -> None:
-    if all(auth):
-        _insert_row_with_auth(host, port, auth, event)
-    else:
-        _insert_row_without_auth(host, port, event)
+    tls = bool(auth)
+    with Sender(host, port, auth=auth, tls=tls) as sender:
+        entity_id = event.data["entity_id"]
+        state = event.data.get("new_state")
+        attrs = dict(state.attributes)
+        sender.row(
+            "qss",
+            symbols={
+                "entity_id": entity_id,
+            },
+            columns={
+                "state": state.state,
+                "attributes": dumps(attrs, sort_keys=True, default=str),
+            },
+            at=event.time_fired,
+        )
+
+        sender.flush()
 
 
 @retry(
@@ -65,7 +39,7 @@ def _insert_row(host: str, port: int, auth: tuple, event: Event) -> None:
     retry=retry_if_exception_type(IngressError),
 )
 def _retry_data_insertion(host: str, port: int, auth: tuple, event: Event) -> None:
-    """Usign a retry for inserting event data into QuestDB."""
+    """Use a retry for inserting event data into QuestDB."""
     _insert_row(host, port, auth, event)
 
 
