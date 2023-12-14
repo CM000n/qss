@@ -1,4 +1,4 @@
-name: Check Package Versions
+name: Check versions
 
 on:
   push:
