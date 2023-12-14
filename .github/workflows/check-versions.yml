@@ -1,0 +1,50 @@
+name: Abgleich von Abhängigkeiten
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types:
+      - created
+
+jobs:
+  check-versions:
+    name: Check-versions
+    strategy:
+      matrix:
+        python-version: [3.9]
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v4
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: ⚙️ Install Poetry
+        uses: abatilo/actions-poetry@v2.3.0
+        with:
+          poetry-version: 1.5.1
+      - name: ⚙️ Install dependencies
+        run: poetry install
+      - name: 🚀 Check Manifest.json
+        run: |
+          current_version=$(poetry version | awk '{print $2}')
+          manifest_version=$(jq -r '.version' custom_components/qss/manifest.json)
+          if [[ "$current_version" != "$manifest_version" ]]; then
+            echo "Error: Version mismatch between pyproject.toml ($current_version) and manifest.json ($manifest_version)"
+            exit 1
+          fi
+
+          current_dependencies=$(poetry show --no-dev | awk '{print $1}')
+          manifest_dependencies=$(jq -r '.requirements[]' custom_components/qss/manifest.json)
+          for dependency in $manifest_dependencies; do
+            if ! echo "$current_dependencies" | grep -q "$dependency"; then
+              echo "Error: Missing dependency $dependency in pyproject.toml"
+              exit 1
+            fi
+          done
