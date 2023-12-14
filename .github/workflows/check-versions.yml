@@ -33,16 +33,20 @@ jobs:
         run: poetry install
       - name: 🚀 Check Manifest.json
         run: |
-          current_version=$(poetry version | awk '{print $2}')
+          pyproject_version=$(poetry version | awk '{print $2}')
+          echo "pyproject.toml version: $pyproject_version"
           manifest_version=$(jq -r '.version' custom_components/qss/manifest.json)
-          if [[ "$current_version" != "$manifest_version" ]]; then
-            echo "Error: Version mismatch between pyproject.toml ($current_version) and manifest.json ($manifest_version)"
+          echo "manifest.json version: $manifest_version"
+          if [[ "$pyproject_version" != "$manifest_version" ]]; then
+            echo "Error: Version mismatch between pyproject.toml ($pyproject_version) and manifest.json ($manifest_version)"
             exit 1
           fi
 
-          current_dependencies=$(poetry show --only main | awk -F' ' '{print $1}')
+          pyproject_dependencies=$(poetry show --only main | awk -F' ' '{print $1}')
+          echo "pyproject.toml dependecies: $pyproject_dependencies"
           manifest_dependencies=$(jq -r '.requirements[]' custom_components/qss/manifest.json)
-          for dependency in $current_dependencies; do
+          echo "manifest.json dependecies: $manifest_dependencies"
+          for dependency in $pyproject_dependencies; do
             matching_dependency=$(echo "$manifest_dependencies" | grep "$dependency")
             if [[ -z "$matching_dependency" ]]; then
               echo "Error: Missing dependency $dependency in manifest.json"
