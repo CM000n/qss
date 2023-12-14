@@ -40,11 +40,17 @@ jobs:
             exit 1
           fi
 
-          current_dependencies=$(poetry show --only main | awk '{print $1}')
+          current_dependencies=$(poetry show --only main --format=json | jq -r '.default.dependencies')
           manifest_dependencies=$(jq -r '.requirements[]' custom_components/qss/manifest.json)
           for dependency in $manifest_dependencies; do
-            if ! echo "$current_dependencies" | grep -q "$dependency"; then
+            poetry_version_spec=$(poetry show --only main --format=json "$dependency" | jq -r '.version')
+            normalized_poetry_version_spec=$(awk '{ sub(/[\^~>=]/, "", $0); print }' <<<"$poetry_version_spec")
+            normalized_manifest_dependency=$(sed 's/=.*,/>=/' <<<"$dependency")
+            if ! poetry show --only main --format=json "$normalized_manifest_dependency" &>/dev/null; then
               echo "Error: Missing dependency $dependency in pyproject.toml"
+              exit 1
+            elif ! [[ "$normalized_manifest_dependency" =~ $normalized_poetry_version_spec ]]; then
+              echo "Error: Version mismatch between pyproject.toml ($poetry_version_spec) and manifest.json ($dependency)"
               exit 1
             fi
           done
