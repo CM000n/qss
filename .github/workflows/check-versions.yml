@@ -1,4 +1,4 @@
-name: Abgleich von Abhängigkeiten
+name: Check Package Versions
 
 on:
   push:
