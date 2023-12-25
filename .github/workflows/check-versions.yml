@@ -41,5 +41,3 @@ jobs:
             echo "Error: Version mismatch between pyproject.toml ($pyproject_version) and manifest.json ($manifest_version)"
             exit 1
           fi
-
-          done
