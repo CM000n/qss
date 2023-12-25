@@ -41,15 +41,3 @@ jobs:
             echo "Error: Version mismatch between pyproject.toml ($pyproject_version) and manifest.json ($manifest_version)"
             exit 1
           fi
-
-          pyproject_dependencies=$(poetry show --only main | awk -F' ' '{print $1}')
-          echo "pyproject.toml dependecies: \n$pyproject_dependencies"
-          manifest_dependencies=$(jq -r '.requirements[]' custom_components/qss/manifest.json)
-          echo "manifest.json dependecies: \n$manifest_dependencies"
-          for dependency in $pyproject_dependencies; do
-            matching_dependency=$(echo "$manifest_dependencies" | grep "$dependency")
-            if [[ -z "$matching_dependency" ]]; then
-              echo "Error: Missing dependency $dependency in manifest.json"
-              exit 1
-            fi
-          done

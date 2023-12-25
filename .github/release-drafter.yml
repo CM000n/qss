@@ -3,20 +3,20 @@ tag-template: v$RESOLVED_VERSION
 change-template: '- #$NUMBER $TITLE @$AUTHOR'
 sort-direction: ascending
 categories:
-  - title: "⚠️ Breaking changes"
-    labels: [":warning: breaking change"]
-  - title: "🚀 Features"
-    labels: [":rocket: feature"]
-  - title: "🔧 Code enhancements"
-    labels: [":wrench: enhancement"]
-  - title: "🐛 Bug Fixes"
-    labels: [":bug: bug"]
-  - title: "💬 Translations"
-    labels: [":speech_balloon: translation"]
-  - title: "📝 Documentation"
-    labels: [":memo: documentation"]
-  - title: "🎲 Dependencies"
-    labels: [":game_die: dependencies"]
+  - title: ⚠️ Breaking changes
+    labels: [':warning: breaking change']
+  - title: 🚀 Features
+    labels: [':rocket: feature']
+  - title: 🔧 Code enhancements
+    labels: [':wrench: enhancement']
+  - title: 🐛 Bug Fixes
+    labels: [':bug: bug']
+  - title: 💬 Translations
+    labels: [':speech_balloon: translation']
+  - title: 📝 Documentation
+    labels: [':memo: documentation']
+  - title: 🎲 Dependencies
+    labels: [':game_die: dependencies']
 version-resolver:
   major:
     labels:

@@ -2,19 +2,29 @@
 name = "qss"
 version = "v0.0.9"
 description = "QuestDB State Storage (QSS) for Home Assistant"
+authors = ["CM000n"]
+keywords = [
+  "homeassistant",
+  "questdb",
+  "database",
+  "timeseries",
+  "analytics",
+  "storage",
+]
 license = "MIT"
 readme = "README.md"
-authors = ["CM000n"]
 
 
 [tool.poetry.dependencies]
-python = "^3.10.0"
-questdb = "^1.0.2"
+python = "^3.11"
+homeassistant = "^2023.12"
+questdb = "^1.2.0"
 tenacity = "^8.0.0"
 
 
 [tool.poetry.dev-dependencies]
-homeassistant = "^2023.6"
+voluptuous-stubs = "^0.1"
+homeassistant-stubs = "^2023.12"
 pre-commit = "^2.21.0"
 codespell = "^2.0.0"
 ruff = "^0.1.6"
