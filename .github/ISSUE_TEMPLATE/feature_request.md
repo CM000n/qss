@@ -1,10 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for a new function to this project
-title: ''
-labels: ':bulb: feature'
-assignees: ''
-
+title: ""
+labels: ":bulb: feature"
+assignees: ""
 ---
 
 **Is your feature request related to a problem? Please describe.**

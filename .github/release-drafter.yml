@@ -1,22 +1,22 @@
 name-template: v$RESOLVED_VERSION 🏳️‍🌈
 tag-template: v$RESOLVED_VERSION
-change-template: '- #$NUMBER $TITLE @$AUTHOR'
+change-template: "- #$NUMBER $TITLE @$AUTHOR"
 sort-direction: ascending
 categories:
   - title: ⚠️ Breaking changes
-    labels: [':warning: breaking change']
+    labels: [":warning: breaking change"]
   - title: 🚀 Features
-    labels: [':rocket: feature']
+    labels: [":rocket: feature"]
   - title: 🔧 Code enhancements
-    labels: [':wrench: enhancement']
+    labels: [":wrench: enhancement"]
   - title: 🐛 Bug Fixes
-    labels: [':bug: bug']
+    labels: [":bug: bug"]
   - title: 💬 Translations
-    labels: [':speech_balloon: translation']
+    labels: [":speech_balloon: translation"]
   - title: 📝 Documentation
-    labels: [':memo: documentation']
+    labels: [":memo: documentation"]
   - title: 🎲 Dependencies
-    labels: [':game_die: dependencies']
+    labels: [":game_die: dependencies"]
 version-resolver:
   major:
     labels:
@@ -40,9 +40,9 @@ exclude-contributors:
   - github-actions
 
 autolabeler:
-  - label: ':bug: bug'
+  - label: ":bug: bug"
     branch:
       - /fix/.+/
-  - label: ':bulb: feature'
+  - label: ":bulb: feature"
     branch:
       - /feature/.+/

@@ -1,10 +1,9 @@
 ---
 name: Enhancement
-about: 'Suggest an idea what we can do better '
-title: ''
-labels: ':sparkles: enhancement'
-assignees: ''
-
+about: "Suggest an idea what we can do better "
+title: ""
+labels: ":sparkles: enhancement"
+assignees: ""
 ---
 
 **Is your enhancement request related to a problem? Please describe.**

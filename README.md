@@ -2,8 +2,7 @@
   <a href="https://questdb.io/" target="blank"><img alt="QuestDB Logo" src="https://questdb.io/img/questdb-logo-themed.svg" width="305px"/></a>
 </div>
 
-QuestDB state storage (QSS) custom component for Home Assistant
-========================================
+# QuestDB state storage (QSS) custom component for Home Assistant
 
 QSS makes it possible to transfer state information of the Home Assistant entities simply and efficiently via InfluxDB Line Protocol into a QuestDB for long-term storage and later analysis.
 
@@ -17,21 +16,24 @@ QSS itself is not a replacement for the recorder component integrated in Home As
 ## Installation
 
 ### Precondition
-* Make sure that your QuestDB instance is up and running.
-* Possible installation methods for QuestDB can be found in the ['Get started' section of the documentation](https://questdb.io/docs/#get-started).
-* Apart from that, you do not need to take any further precautions at present. QSS automatically creates a table named ```qss``` in which it stores the data.
 
+- Make sure that your QuestDB instance is up and running.
+- Possible installation methods for QuestDB can be found in the ['Get started' section of the documentation](https://questdb.io/docs/#get-started).
+- Apart from that, you do not need to take any further precautions at present. QSS automatically creates a table named `qss` in which it stores the data.
 
 ### Installation of the QSS component:
+
 Manual:
-* Copy the ```qss``` folder in the ```custom_components``` folder of this repository into the ```custom_components``` folder of your Home Assistant installation.
+
+- Copy the `qss` folder in the `custom_components` folder of this repository into the `custom_components` folder of your Home Assistant installation.
 
 Automatic:
-* Add this repository as a custom repository to your [HACS](https://hacs.xyz/) installation. You can then install QSS via HACS. Full HACS compatibility and inclusion in the official HACS repo collection is planned for the future.
 
+- Add this repository as a custom repository to your [HACS](https://hacs.xyz/) installation. You can then install QSS via HACS. Full HACS compatibility and inclusion in the official HACS repo collection is planned for the future.
 
 configuration.yaml
-* Add an entry to your Home Assistant ```configuration.yaml``` that might look like this::
+
+- Add an entry to your Home Assistant `configuration.yaml` that might look like this::
 
 ```yaml
 qss:
@@ -48,6 +50,7 @@ qss:
     entities:
       - "person.john_doe"
 ```
+
 Note: Authenication details are completely optional. How to create them can be found in the Quest DB documentation at this point:
 https://questdb.io/docs/reference/api/ilp/authenticate
 
@@ -120,17 +123,19 @@ Enables the qss integration. Only allowed once.
 ```
 
 ## Details
-The data is stored in a QuestDB table named ``qss``, which has the following structure:
+
+The data is stored in a QuestDB table named `qss`, which has the following structure:
 
 | Column name: | entity_id | state  | attributes | timestamps |
-|:-------------|:---------:|:------:|:----------:|:----------:|
-| Type:        | symbol    | string | string     | timestamps |
+| :----------- | :-------: | :----: | :--------: | :--------: |
+| Type:        |  symbol   | string |   string   | timestamps |
 
 ## Credits
-* First of all, thanks to all the contributors to the great [QuestDB project](https://github.com/questdb/questdb). Without their work, this custom component would never have been created.
-* QSS was largely inspired by and based on [LTSS (Long Time State Storage)](https://github.com/freol35241/ltss) by [freol35241](https://github.com/freol35241). Many thanks to [freol35241](https://github.com/freol35241) for his great work!
 
+- First of all, thanks to all the contributors to the great [QuestDB project](https://github.com/questdb/questdb). Without their work, this custom component would never have been created.
+- QSS was largely inspired by and based on [LTSS (Long Time State Storage)](https://github.com/freol35241/ltss) by [freol35241](https://github.com/freol35241). Many thanks to [freol35241](https://github.com/freol35241) for his great work!
 
 ## Disclaimer
-* QSS is not an official extension of the [QuestDB project](https://github.com/questdb/questdb) and is not directly related to it.
-* No liability is accepted for any loss of data that may occur through the use of QSS. Use at your own risk!
+
+- QSS is not an official extension of the [QuestDB project](https://github.com/questdb/questdb) and is not directly related to it.
+- No liability is accepted for any loss of data that may occur through the use of QSS. Use at your own risk!
