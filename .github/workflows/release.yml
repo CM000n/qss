@@ -2,32 +2,46 @@ name: Release
 
 on:
   release:
-    types: [published]
+    types:
+      - published
 
 jobs:
-  release_zip_file:
-    name: Prepare release asset
+  release:
+    name: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v4.1.1
 
-      - name: Get version
-        id: version
-        uses: home-assistant/actions/helpers/version@master
+      - name: 🔢 Adjust version number
+        shell: bash
+        run: |
+          version="${{ github.event.release.tag_name }}"
+          version="${version,,}"
+          version="${version#v}"
+          yq e -P -o=json \
+            -i ".version = \"${version}\"" \
+            "${{ github.workspace }}/custom_components/qss/manifest.json"
 
-      - name: Set version number
+      - name: 📦 Created zipped release package
+        shell: bash
         run: |
-          python3 ${{ github.workspace }}/.github/scripts/update_manifest.py --version ${{ steps.version.outputs.version }}
-      - name: Create zip
-        run: |
-          cd custom_components/qss
+          cd "${{ github.workspace }}/custom_components/qss"
           zip qss.zip -r ./
-      - name: Upload zip to release
-        uses: svenstaro/upload-release-action@2.7.0
+
+      - name: 🔏 Sign release package
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./custom_components/qss/qss.zip
-          asset_name: qss.zip
-          tag: ${{ github.ref }}
-          overwrite: true
+          inputs: ${{ github.workspace }}/custom_components/qss/qss.zip
+
+      - name: ⬆️ Upload zip to release
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          files: ${{ github.workspace }}/custom_components/qss/qss.zip
+
+        # Upload this one in the future, currently problematic for HACS
+        # https://github.com/frenck/spook/issues/286
+        # ${{ github.workspace }}/custom_components/spook/spook.zip.sigstore
