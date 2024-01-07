@@ -11,12 +11,12 @@ updates:
     schedule:
       interval: weekly
     labels:
-      - ':robot: bot'
-      - ':game_die: dependencies'
+      - ":robot: bot"
+      - ":game_die: dependencies"
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     labels:
-      - ':robot: bot'
-      - ':game_die: dependencies'
+      - ":robot: bot"
+      - ":game_die: dependencies"

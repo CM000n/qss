@@ -26,6 +26,7 @@ tenacity = "^8.0.0"
 voluptuous-stubs = "^0.1"
 homeassistant-stubs = "^2023.12"
 pre-commit = "^2.21.0"
+pre-commit-hooks = "^4.5.0"
 codespell = "^2.0.0"
 ruff = "^0.1.6"
 
