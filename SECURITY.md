@@ -7,7 +7,7 @@ It is recommended to always use the latest stable version to benefit from the la
 
 | Version | Supported          |
 | ------- | ------------------ |
-| v0.0.6  | :white_check_mark: |
+| v0.0.10 | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
