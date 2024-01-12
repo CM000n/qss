@@ -68,8 +68,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up qss."""
     conf = config[DOMAIN]
 
-    db_host = conf.get(CONF_HOST)
-    db_port = conf.get(CONF_PORT)
+    db_host = str(conf.get(CONF_HOST))
+    db_port = int(conf.get(CONF_PORT))
 
     entity_filter = convert_include_exclude_filter(conf)
 
