@@ -61,6 +61,10 @@ qss:
 (map)(Required)
 Enables the qss integration. Only allowed once.
 
+  split_attributes:
+  (bool)(Optional)
+  If set to "true", stores each event attribute in its own column. Otherwise, stores all attributes as a dict in the "attrs" column. (Defaults to False)
+
   host:
   (string)(Required)
   The URL or IP Address that points to your QuestDB database.
