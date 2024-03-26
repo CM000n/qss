@@ -1,6 +1,6 @@
 """Helper functions for IO operations on QuestDB."""
 import logging
-from json import dumps
+from json import dumps, loads
 from queue import Queue
 
 from homeassistant.core import Event
@@ -16,10 +16,10 @@ def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event, split
     with Sender(host, port, auth=auth, tls=True) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
-        attrs = dict(state.attributes)
+        attrs = dumps(dict(state.attributes), sort_keys=True, default=str)
         columns = {"state": state}
         if split_attributes:
-            columns.update(attrs)
+            columns.update(loads(attrs))
         else:
             columns["attrs"] = attrs
 
@@ -39,13 +39,12 @@ def _insert_row_without_auth(host: str, port: int, event: Event, split_attribute
     with Sender(host, port) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
-        attrs = dict(state.attributes)
+        attrs = dumps(dict(state.attributes), sort_keys=True, default=str)
         columns = {"state": state}
         if split_attributes:
-            columns.update(attrs)
+            columns.update(loads(attrs))
         else:
             columns["attrs"] = attrs
-
         sender.row(
             "qss",
             symbols={
