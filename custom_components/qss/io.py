@@ -16,13 +16,11 @@ def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event, split
     with Sender(host, port, auth=auth, tls=True) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
-        attrs = dumps(dict(state.attributes), sort_keys=True, default=str)
-        columns = {"state": state}
+        columns = {"state": state.state}
         if split_attributes:
-            columns.update(loads(attrs))
+            columns.update(state.attributes)
         else:
-            columns["attrs"] = attrs
-
+            columns["attrs"] = dumps(dict(state.attributes), sort_keys=True, default=str)
         sender.row(
             "qss",
             symbols={
@@ -39,12 +37,11 @@ def _insert_row_without_auth(host: str, port: int, event: Event, split_attribute
     with Sender(host, port) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
-        attrs = dumps(dict(state.attributes), sort_keys=True, default=str)
-        columns = {"state": state}
+        columns = {"state": state.state}
         if split_attributes:
-            columns.update(loads(attrs))
+            columns.update(state.attributes)
         else:
-            columns["attrs"] = attrs
+            columns["attrs"] = dumps(dict(state.attributes), sort_keys=True, default=str)
         sender.row(
             "qss",
             symbols={
