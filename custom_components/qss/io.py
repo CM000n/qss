@@ -12,40 +12,46 @@ from .const import RETRY_ATTEMPTS, RETRY_WAIT_SECONDS
 _LOGGER = logging.getLogger(__name__)
 
 
-def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event) -> None:
+def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event, split_attributes: bool) -> None:
     with Sender(host, port, auth=auth, tls=True) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
         attrs = dict(state.attributes)
+        columns = {"state": state}
+        if split_attributes:
+            columns.update(attrs)
+        else:
+            columns["attrs"] = attrs
+
         sender.row(
             "qss",
             symbols={
                 "entity_id": entity_id,
             },
-            columns={
-                "state": state.state,
-                "attributes": dumps(attrs, sort_keys=True, default=str),
-            },
+            columns=columns,
             at=event.time_fired,
         )
 
         sender.flush()
 
 
-def _insert_row_without_auth(host: str, port: int, event: Event) -> None:
+def _insert_row_without_auth(host: str, port: int, event: Event, split_attributes: bool) -> None:
     with Sender(host, port) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
         attrs = dict(state.attributes)
+        columns = {"state": state}
+        if split_attributes:
+            columns.update(attrs)
+        else:
+            columns["attrs"] = attrs
+
         sender.row(
             "qss",
             symbols={
                 "entity_id": entity_id,
             },
-            columns={
-                "state": state.state,
-                "attributes": dumps(attrs, sort_keys=True, default=str),
-            },
+            columns=columns,
             at=event.time_fired,
         )
 
@@ -57,15 +63,15 @@ def _insert_row_without_auth(host: str, port: int, event: Event) -> None:
     wait=wait_fixed(RETRY_WAIT_SECONDS),
     retry=retry_if_exception_type(IngressError),
 )
-def _retry_data_insertion(host: str, port: int, auth: tuple, event: Event) -> None:
+def _retry_data_insertion(host: str, port: int, auth: tuple, event: Event, split_attributes: bool) -> None:
     """Use a retry for inserting event data into QuestDB."""
     if all(auth):
-        _insert_row_with_auth(host, port, auth, event)
+        _insert_row_with_auth(host, port, auth, event, split_attributes)
     else:
-        _insert_row_without_auth(host, port, event)
+        _insert_row_without_auth(host, port, event, split_attributes)
 
 
-def insert_event_data_into_questdb(host: str, port: int, auth: tuple, event: Event, queue: Queue) -> None:
+def insert_event_data_into_questdb(host: str, port: int, auth: tuple, event: Event, queue: Queue, split_attributes: bool) -> None:
     """Insert given event data into QuestDB."""
-    _retry_data_insertion(host, port, auth, event)
+    _retry_data_insertion(host, port, auth, event, split_attributes)
     queue.task_done()

@@ -28,6 +28,7 @@ from .const import (
     CONF_AUTH_Y_KEY,
     CONF_HOST,
     CONF_PORT,
+    CONF_SPLIT_ATTRIBUTES,
     DOMAIN,
 )
 from .event_handling import (
@@ -57,6 +58,7 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Required(CONF_HOST): cv.string,
                 vol.Required(CONF_PORT): cv.positive_int,
                 vol.Optional(CONF_AUTH, default={}): AUTHENTICATION_SCHEMA,
+                vol.Optional(CONF_SPLIT_ATTRIBUTES, default=False): cv.boolean,
             }
         )
     },
@@ -79,7 +81,9 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     auth_y_key = conf.get(CONF_AUTH).get(CONF_AUTH_Y_KEY)
     db_auth = (auth_kid, auth_d_key, auth_x_key, auth_y_key)
 
-    instance = QuestDB(hass=hass, host=db_host, port=db_port, entity_filter=entity_filter, auth=db_auth)
+    split_attrs = conf.get(CONF_SPLIT_ATTRIBUTES)
+
+    instance = QuestDB(hass=hass, host=db_host, port=db_port, entity_filter=entity_filter, auth=db_auth, split_attributes=split_attrs)
     instance.async_initialize()
     instance.start()
 
@@ -96,6 +100,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         port: int,
         entity_filter: Callable[[str], bool],
         auth: tuple,
+        split_attributes: bool,
     ) -> None:
         """Initialize qss."""
         threading.Thread.__init__(self, name="QSS")
@@ -105,6 +110,8 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         self.port = port
         self.entity_filter = entity_filter
         self.auth = auth
+
+        self.split_attributes = split_attributes
 
         self.queue: Any = queue.Queue()
         self.qss_ready = asyncio.Future()

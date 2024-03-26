@@ -13,6 +13,8 @@ CONF_AUTH_D_KEY = "d_key"
 CONF_AUTH_X_KEY = "x_key"
 CONF_AUTH_Y_KEY = "y_key"
 
+CONF_SPLIT_ATTRIBUTES = "split_attributes"
+
 RETRY_WAIT_SECONDS = 5
 RETRY_ATTEMPTS = 10
 
