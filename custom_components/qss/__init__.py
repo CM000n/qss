@@ -160,7 +160,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         while True:
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
-            insert_event_data_into_questdb(self.host, self.port, self.auth, event, self.queue)
+            insert_event_data_into_questdb(self.host, self.port, self.auth, event, self.queue, self.split_attributes)
 
     @callback
     def event_listener(self, event: Event):
