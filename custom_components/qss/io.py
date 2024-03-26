@@ -1,6 +1,6 @@
 """Helper functions for IO operations on QuestDB."""
 import logging
-from json import dumps, loads
+from json import dumps
 from queue import Queue
 
 from homeassistant.core import Event
