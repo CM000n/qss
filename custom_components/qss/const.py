@@ -14,7 +14,7 @@ CONF_AUTH_X_KEY = "x_key"
 CONF_AUTH_Y_KEY = "y_key"
 
 RETRY_WAIT_SECONDS = 5
-RETRY_ATTEMPTS = 10
+RETRY_ATTEMPTS = 150
 
 STARTUP_MESSAGE = f"""
 -------------------------------------------------------------------
