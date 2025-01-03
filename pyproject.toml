@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qss"
-version = "v0.0.11"
+version = "v0.0.13"
 description = "QuestDB State Storage (QSS) for Home Assistant"
 authors = ["CM000n"]
 keywords = [
@@ -16,7 +16,7 @@ readme = "README.md"
 
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.12,<3.14"
 homeassistant = "^2024.12"
 questdb = "^2.0.3"
 tenacity = "^8.0.0"
