@@ -4,7 +4,7 @@ from json import dumps
 from queue import Queue
 
 from homeassistant.core import Event
-from questdb.ingress import IngressError, Sender
+from questdb.ingress import IngressError, Protocol, Sender
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 from .const import RETRY_ATTEMPTS, RETRY_WAIT_SECONDS
@@ -13,7 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event) -> None:
-    with Sender(host, port, auth=auth, tls=True) as sender:
+    with Sender(Protocol.Tcps, host, port, username=auth[0], token=auth[1], token_x=auth[2], token_y=auth[3]) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
         attrs = dict(state.attributes)
@@ -33,7 +33,7 @@ def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event) -> No
 
 
 def _insert_row_without_auth(host: str, port: int, event: Event) -> None:
-    with Sender(host, port) as sender:
+    with Sender(Protocol.Tcp, host, port) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
         attrs = dict(state.attributes)
