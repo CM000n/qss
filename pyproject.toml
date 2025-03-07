@@ -19,7 +19,7 @@ readme = "README.md"
 python = ">=3.12,<3.14"
 homeassistant = "^2024.12"
 questdb = "^2.0.3"
-tenacity = "^8.0.0"
+tenacity = "^9.0.0"
 
 
 [tool.poetry.dev-dependencies]
