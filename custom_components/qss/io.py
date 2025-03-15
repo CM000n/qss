@@ -1,4 +1,5 @@
 """Helper functions for IO operations on QuestDB."""
+
 import logging
 from json import dumps
 from queue import Queue
@@ -13,7 +14,15 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event) -> None:
-    with Sender(Protocol.Tcps, host, port, username=auth[0], token=auth[1], token_x=auth[2], token_y=auth[3]) as sender:
+    with Sender(
+        Protocol.Tcps,
+        host,
+        port,
+        username=auth[0],
+        token=auth[1],
+        token_x=auth[2],
+        token_y=auth[3],
+    ) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
         attrs = dict(state.attributes)
@@ -65,7 +74,9 @@ def _retry_data_insertion(host: str, port: int, auth: tuple, event: Event) -> No
         _insert_row_without_auth(host, port, event)
 
 
-def insert_event_data_into_questdb(host: str, port: int, auth: tuple, event: Event, queue: Queue) -> None:
+def insert_event_data_into_questdb(
+    host: str, port: int, auth: tuple, event: Event, queue: Queue
+) -> None:
     """Insert given event data into QuestDB."""
     _retry_data_insertion(host, port, auth, event)
     queue.task_done()
