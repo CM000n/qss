@@ -14,29 +14,22 @@ keywords = [
 license = "MIT"
 readme = "README.md"
 
-
 [tool.poetry.dependencies]
 python = ">=3.12,<3.14"
-homeassistant = "^2024.12"
+homeassistant = "^2025"
 questdb = "^2.0.3"
 tenacity = "^9.0.0"
 
-
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 voluptuous-stubs = "^0.1"
-homeassistant-stubs = "^2024.12"
+homeassistant-stubs = "^2025"
 pre-commit = "^4.0.0"
-pre-commit-hooks = "^5.0.0"
-codespell = "^2.0.0"
-ruff = "^0.1.6"
-
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-
-[tool.ruff]
+[tool.ruff.lint]
 select = [
     # Ruff specific
     "RUF",
@@ -64,5 +57,6 @@ select = [
     "I"
 ]
 extend-ignore = ["PLR2004", "D203", "D213", "COM812"]
-line-length = 120
-fix = true
+
+[tool.ruff.format]
+docstring-code-format = true

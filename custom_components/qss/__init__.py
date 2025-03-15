@@ -1,4 +1,5 @@
 """Support for recording details."""
+
 import asyncio
 import concurrent.futures
 import logging
@@ -79,7 +80,9 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     auth_y_key = conf.get(CONF_AUTH).get(CONF_AUTH_Y_KEY)
     db_auth = (auth_kid, auth_d_key, auth_x_key, auth_y_key)
 
-    instance = QuestDB(hass=hass, host=db_host, port=db_port, entity_filter=entity_filter, auth=db_auth)
+    instance = QuestDB(
+        hass=hass, host=db_host, port=db_port, entity_filter=entity_filter, auth=db_auth
+    )
     instance.async_initialize()
     instance.start()
 
@@ -89,7 +92,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 class QuestDB(threading.Thread):  # pylint: disable = R0902
     """A threaded qss class."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         hass: HomeAssistant,
         host: str,
@@ -142,7 +145,9 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                     """Notify that hass has started."""
                     hass_started.set_result(None)
 
-                self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, notify_hass_started)
+                self.hass.bus.async_listen_once(
+                    EVENT_HOMEASSISTANT_START, notify_hass_started
+                )
 
         self.hass.add_job(register)
         result = hass_started.result()
@@ -153,7 +158,9 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         while True:
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
-            insert_event_data_into_questdb(self.host, self.port, self.auth, event, self.queue)
+            insert_event_data_into_questdb(
+                self.host, self.port, self.auth, event, self.queue
+            )
 
     @callback
     def event_listener(self, event: Event):

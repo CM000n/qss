@@ -1,89 +1,49 @@
+ci:
+  autofix_prs: true
 repos:
-  - repo: local
+  - repo: https://github.com/python-poetry/poetry
+    rev: 2.1.1
+    hooks:
+      - id: poetry-check
+        name: 📜 Check pyproject with Poetry
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        name: 👄 Check code spelling
+        args: [--write-changes, --skip="./*, translations/*", -L hass]
+        exclude: (pyproject.toml|poetry.lock|)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
     hooks:
       - id: check-json
         name: "✅ Check JSON files"
-        language: system
-        types: [json]
-        entry: poetry run check-json
       - id: check-toml
         name: "✅ Check TOML files"
-        language: system
-        types: [toml]
-        entry: poetry run check-toml
       - id: check-yaml
         name: "✅ Check YAML files"
-        language: system
-        types: [yaml]
-        entry: poetry run check-yaml
-      - id: check-json
+      - id: check-added-large-files
         name: "📁 Check for large files"
-        language: system
-        entry: poetry run check-added-large-files
-      - id: check-json
+      - id: debug-statements
         name: "🐛 Check for forgotten debug statemens"
-        language: system
-        types: [python]
-        entry: poetry run debug-statement-hook
       - id: check-merge-conflict
         name: "💥 Check for merge conflicts"
-        language: system
-        types: [text]
-        entry: poetry run check-merge-conflict
       - id: check-symlinks
         name: "🔗 Check for broken symlinks"
-        language: system
-        types: [symlink]
-        entry: poetry run check-symlinks
-      - id: codespell
-        name: "💭 Check for code spelling"
-        entry: poetry run codespell --write-changes --skip="./*"
-        language: system
-        pass_filenames: false
-        always_run: true
       - id: end-of-file-fixer
         name: "🔚 Fix End of Files"
-        language: system
-        types: [text]
-        entry: poetry run end-of-file-fixer
-        stages: [commit, push, manual]
-      - id: end-of-file-fixer
+      - id: trailing-whitespace
         name: "⬜ Fix trailing whitespaces"
-        language: system
-        types: [text]
-        entry: poetry run end-of-file-fixer
-        stages: [commit, push, manual]
-      - id: ruff-check
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.0
+    hooks:
+      - id: ruff
         name: "🐶 Ruff Linter"
-        language: system
-        types: [python]
-        entry: poetry run ruff check --fix
-        require_serial: true
-        stages: [commit, push, manual]
+        args: [--fix]
       - id: ruff-format
         name: "🐶 Ruff Formatter"
-        language: system
-        types: [python]
-        entry: poetry run ruff format
-        require_serial: true
-        stages: [commit, push, manual]
-      - id: poetry pyproject check
-        name: "📜 Check pyproject with Poetry"
-        language: system
-        entry: poetry check
-        pass_filenames: false
-        always_run: true
-      - id: no-commit-to-branch
-        name: "🛑 Don't commit to main branch"
-        language: system
-        entry: poetry run no-commit-to-branch
-        pass_filenames: false
-        always_run: true
-        args:
-          - --branch=master
-          - --branch=main
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+    rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         name: 🎨 Format using prettier
