@@ -2,6 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "labels": [":game_die: dependencies", ":robot: bot"],
+  "lockFileMaintenance": { "enabled": true },
   "pre-commit": {
     "enabled": true
   }
