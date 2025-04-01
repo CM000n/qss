@@ -16,7 +16,7 @@ jobs:
     name: Check-versions
     strategy:
       matrix:
-        python-version: [3.12]
+        python-version: [3.13]
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
