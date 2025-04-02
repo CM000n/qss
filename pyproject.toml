@@ -39,4 +39,5 @@ fix = true
 extend-exclude = ["tests"]
 lint.select = ["ALL"]
 lint.extend-ignore = ["D203", "D213", "COM812"]
+lint.pydocstyle.convention = "google"
 format.docstring-code-format = true
