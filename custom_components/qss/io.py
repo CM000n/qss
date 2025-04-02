@@ -75,7 +75,11 @@ def _retry_data_insertion(host: str, port: int, auth: tuple, event: Event) -> No
 
 
 def insert_event_data_into_questdb(
-    host: str, port: int, auth: tuple, event: Event, queue: Queue
+    host: str,
+    port: int,
+    auth: tuple,
+    event: Event,
+    queue: Queue,
 ) -> None:
     """Insert given event data into QuestDB."""
     _retry_data_insertion(host, port, auth, event)
