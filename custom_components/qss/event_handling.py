@@ -13,11 +13,10 @@ def put_event_to_queue(
     """Get events with new states and put them in the process queue."""
     entity_id = event.data.get(ATTR_ENTITY_ID)
     state = event.data.get("new_state")
-    if state is not None:
-        if all(
-            [entity_id, state, state.state != STATE_UNKNOWN, entity_filter(entity_id)]
-        ):
-            queue.put(event)
+    if state is not None and all(
+        [entity_id, state, state.state != STATE_UNKNOWN, entity_filter(entity_id)]
+    ):
+        queue.put(event)
 
 
 def get_event_from_queue(queue: Queue) -> Event:
