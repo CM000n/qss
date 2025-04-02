@@ -5,7 +5,8 @@ import concurrent.futures
 import logging
 import queue
 import threading
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -47,7 +48,7 @@ AUTHENTICATION_SCHEMA = vol.Schema(
         vol.Required(CONF_AUTH_D_KEY, default=""): cv.string,
         vol.Required(CONF_AUTH_X_KEY, default=""): cv.string,
         vol.Required(CONF_AUTH_Y_KEY, default=""): cv.string,
-    }
+    },
 )
 
 
@@ -58,8 +59,8 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Required(CONF_HOST): cv.string,
                 vol.Required(CONF_PORT): cv.positive_int,
                 vol.Optional(CONF_AUTH, default={}): AUTHENTICATION_SCHEMA,
-            }
-        )
+            },
+        ),
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -81,7 +82,11 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     db_auth = (auth_kid, auth_d_key, auth_x_key, auth_y_key)
 
     instance = QuestDB(
-        hass=hass, host=db_host, port=db_port, entity_filter=entity_filter, auth=db_auth
+        hass=hass,
+        host=db_host,
+        port=db_port,
+        entity_filter=entity_filter,
+        auth=db_auth,
     )
     instance.async_initialize()
     instance.start()
@@ -113,21 +118,21 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         self.qss_ready = asyncio.Future()
 
     @callback
-    def async_initialize(self):
+    def async_initialize(self) -> None:
         """Initialize qss."""
         self.hass.bus.async_listen(EVENT_STATE_CHANGED, self.event_listener)
 
-    def run(self):
+    def run(self) -> None:
         """Run qss and insert data."""
         shutdown_task = object()
         hass_started = concurrent.futures.Future()
 
         @callback
-        def register():
+        def register() -> None:
             """Register qss to Home Assistant."""
             self.qss_ready.set_result(True)
 
-            def shutdown(event: Event):  # noqa: ARG001
+            def shutdown(event: Event) -> None:  # noqa: ARG001
                 """Shut down the qss."""
                 if not hass_started.done():
                     hass_started.set_result(shutdown_task)
@@ -141,12 +146,13 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             else:
 
                 @callback
-                def notify_hass_started(event: Event):  # noqa: ARG001
+                def notify_hass_started(event: Event) -> None:  # noqa: ARG001
                     """Notify that hass has started."""
                     hass_started.set_result(None)
 
                 self.hass.bus.async_listen_once(
-                    EVENT_HOMEASSISTANT_START, notify_hass_started
+                    EVENT_HOMEASSISTANT_START,
+                    notify_hass_started,
                 )
 
         self.hass.add_job(register)
@@ -159,10 +165,14 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
             insert_event_data_into_questdb(
-                self.host, self.port, self.auth, event, self.queue
+                self.host,
+                self.port,
+                self.auth,
+                event,
+                self.queue,
             )
 
     @callback
-    def event_listener(self, event: Event):
+    def event_listener(self, event: Event) -> None:
         """Listen for new events and put them in the process queue."""
         put_event_to_queue(event, self.entity_filter, self.queue)
