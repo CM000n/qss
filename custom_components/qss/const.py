@@ -8,6 +8,7 @@ CONF_HOST = "host"
 CONF_PORT = "port"
 
 CONF_AUTH = "authentication"
+CONF_AUTH_SSL_CHECK = "ssl_check"
 CONF_AUTH_KID = "kid"
 CONF_AUTH_D_KEY = "d_key"
 CONF_AUTH_X_KEY = "x_key"

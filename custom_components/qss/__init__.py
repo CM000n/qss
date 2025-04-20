@@ -24,6 +24,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import (
     CONF_AUTH,
+    CONF_AUTH_SSL_CHECK,
     CONF_AUTH_D_KEY,
     CONF_AUTH_KID,
     CONF_AUTH_X_KEY,
@@ -44,6 +45,7 @@ _LOGGER = logging.getLogger(__name__)
 
 AUTHENTICATION_SCHEMA = vol.Schema(
     {
+        vol.Required(CONF_AUTH_SSL_CHECK, default=True): cv.boolean,
         vol.Required(CONF_AUTH_KID, default=""): cv.string,
         vol.Required(CONF_AUTH_D_KEY, default=""): cv.string,
         vol.Required(CONF_AUTH_X_KEY, default=""): cv.string,
@@ -76,10 +78,11 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     entity_filter = convert_include_exclude_filter(conf)
 
     auth_kid = conf.get(CONF_AUTH).get(CONF_AUTH_KID)
+    auth_ssl_check = conf.get(CONF_AUTH).get(CONF_AUTH_SSL_CHECK)
     auth_d_key = conf.get(CONF_AUTH).get(CONF_AUTH_D_KEY)
     auth_x_key = conf.get(CONF_AUTH).get(CONF_AUTH_X_KEY)
     auth_y_key = conf.get(CONF_AUTH).get(CONF_AUTH_Y_KEY)
-    db_auth = (auth_kid, auth_d_key, auth_x_key, auth_y_key)
+    db_auth = (auth_kid, auth_d_key, auth_x_key, auth_y_key, auth_ssl_check)
 
     instance = QuestDB(
         hass=hass,
