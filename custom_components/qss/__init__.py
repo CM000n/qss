@@ -24,9 +24,9 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import (
     CONF_AUTH,
-    CONF_AUTH_SSL_CHECK,
     CONF_AUTH_D_KEY,
     CONF_AUTH_KID,
+    CONF_AUTH_SSL_CHECK,
     CONF_AUTH_X_KEY,
     CONF_AUTH_Y_KEY,
     CONF_HOST,
