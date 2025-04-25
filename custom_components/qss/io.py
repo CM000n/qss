@@ -78,10 +78,10 @@ def _retry_data_insertion(host: str, port: int, auth: tuple, event: Event) -> No
 def insert_event_data_into_questdb(
     host: str, port: int, auth: tuple, event: Event, queue: Queue
 ) -> None:
+    """Insert given event data into QuestDB."""
     try:
-        """Insert given event data into QuestDB."""
         _LOGGER.debug("%s %s %s %s", host, port, auth, event)
         _retry_data_insertion(host, port, auth, event)
     except IngressError as e:
-        _LOGGER.error(e)
+        _LOGGER.exception(e)
     queue.task_done()
