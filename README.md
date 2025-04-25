@@ -40,6 +40,7 @@ qss:
   host: "192.168.178.3"
   port: 9009
   authentication:
+    ssl_check: True
     kid: "your_kid"
     d_key: "your_d_key"
     x_key: "your_x_key"
@@ -71,7 +72,11 @@ Enables the qss integration. Only allowed once.
 
   authentication:
   (dict)(Optional)
-  Under this entry you can, if desired, enter the authenication parameters necessary for your Quest DB installation. The entry is completely optional if your Quest DB installation does not have any additional authentication settings.
+  Under this entry you can, if desired, enter the authenication parameters necessary for your Quest DB installation. The entry is completely optional if your Quest DB installation does not have any additional authentication settings. Keep in mind that this authentication needs an SSL setup, either from QuestDB Enterprise or a reverse proxy.
+
+    ssl_check:
+    (bool)(Optional)
+    If you want to surpress the check of the SSL certificate of your QuestDB installation, set this to `False`. Default to `True`
 
     kid:
     (string)(Required)

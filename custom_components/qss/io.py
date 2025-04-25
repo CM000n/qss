@@ -22,6 +22,7 @@ def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event) -> No
         token=auth[1],
         token_x=auth[2],
         token_y=auth[3],
+        tls_verify=auth[4],
     ) as sender:
         entity_id = event.data["entity_id"]
         state = event.data.get("new_state")
@@ -68,19 +69,19 @@ def _insert_row_without_auth(host: str, port: int, event: Event) -> None:
 )
 def _retry_data_insertion(host: str, port: int, auth: tuple, event: Event) -> None:
     """Use a retry for inserting event data into QuestDB."""
-    if all(auth):
+    if auth[0]:
         _insert_row_with_auth(host, port, auth, event)
     else:
         _insert_row_without_auth(host, port, event)
 
 
 def insert_event_data_into_questdb(
-    host: str,
-    port: int,
-    auth: tuple,
-    event: Event,
-    queue: Queue,
+    host: str, port: int, auth: tuple, event: Event, queue: Queue
 ) -> None:
     """Insert given event data into QuestDB."""
-    _retry_data_insertion(host, port, auth, event)
+    try:
+        _LOGGER.debug("%s %s %s %s", host, port, auth, event)
+        _retry_data_insertion(host, port, auth, event)
+    except IngressError:
+        _LOGGER.exception()
     queue.task_done()
