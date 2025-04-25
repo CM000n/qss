@@ -82,6 +82,6 @@ def insert_event_data_into_questdb(
     try:
         _LOGGER.debug("%s %s %s %s", host, port, auth, event)
         _retry_data_insertion(host, port, auth, event)
-    except:
+    except IngressError:
         _LOGGER.exception()
     queue.task_done()
