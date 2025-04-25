@@ -6,10 +6,15 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   draft_release:
     name: Release Drafter
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Run release-drafter
         uses: release-drafter/release-drafter@master
