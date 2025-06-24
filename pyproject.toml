@@ -16,13 +16,13 @@ authors = [{name = "CM000n"}]
 requires-python = '>=3.12,<3.14'
 
 [tool.poetry]
-version = "v0.0.15"
+version = "v0.0.16"
 package-mode = false
 requires-poetry = '>=2.0,<3.0'
 
 [tool.poetry.dependencies]
 homeassistant = "^2025"
-questdb = "^2.0.3"
+questdb = "^2.0.4"
 tenacity = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]
@@ -36,8 +36,10 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 fix = true
-extend-exclude = ["tests"]
+lint.exclude = ["tests/**"]
 lint.select = ["ALL"]
 lint.extend-ignore = ["D203", "D213", "COM812"]
 lint.pydocstyle.convention = "google"
+lint.isort.split-on-trailing-comma = false
 format.docstring-code-format = true
+format.skip-magic-trailing-comma = true
