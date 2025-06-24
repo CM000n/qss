@@ -29,9 +29,7 @@ def _insert_row_with_auth(host: str, port: int, auth: tuple, event: Event) -> No
         attrs = dict(state.attributes)
         sender.row(
             "qss",
-            symbols={
-                "entity_id": entity_id,
-            },
+            symbols={"entity_id": entity_id},
             columns={
                 "state": state.state,
                 "attributes": dumps(attrs, sort_keys=True, default=str),
@@ -49,9 +47,7 @@ def _insert_row_without_auth(host: str, port: int, event: Event) -> None:
         attrs = dict(state.attributes)
         sender.row(
             "qss",
-            symbols={
-                "entity_id": entity_id,
-            },
+            symbols={"entity_id": entity_id},
             columns={
                 "state": state.state,
                 "attributes": dumps(attrs, sort_keys=True, default=str),

@@ -50,7 +50,7 @@ AUTHENTICATION_SCHEMA = vol.Schema(
         vol.Required(CONF_AUTH_D_KEY, default=""): cv.string,
         vol.Required(CONF_AUTH_X_KEY, default=""): cv.string,
         vol.Required(CONF_AUTH_Y_KEY, default=""): cv.string,
-    },
+    }
 )
 
 
@@ -61,8 +61,8 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Required(CONF_HOST): cv.string,
                 vol.Required(CONF_PORT): cv.positive_int,
                 vol.Optional(CONF_AUTH, default={}): AUTHENTICATION_SCHEMA,
-            },
-        ),
+            }
+        )
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -85,11 +85,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     db_auth = (auth_kid, auth_d_key, auth_x_key, auth_y_key, auth_ssl_check)
 
     instance = QuestDB(
-        hass=hass,
-        host=db_host,
-        port=db_port,
-        entity_filter=entity_filter,
-        auth=db_auth,
+        hass=hass, host=db_host, port=db_port, entity_filter=entity_filter, auth=db_auth
     )
     instance.async_initialize()
     instance.start()
@@ -154,8 +150,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                     hass_started.set_result(None)
 
                 self.hass.bus.async_listen_once(
-                    EVENT_HOMEASSISTANT_START,
-                    notify_hass_started,
+                    EVENT_HOMEASSISTANT_START, notify_hass_started
                 )
 
         self.hass.add_job(register)
@@ -168,11 +163,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
             insert_event_data_into_questdb(
-                self.host,
-                self.port,
-                self.auth,
-                event,
-                self.queue,
+                self.host, self.port, self.auth, event, self.queue
             )
 
     @callback
