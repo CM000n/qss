@@ -21,6 +21,7 @@ from homeassistant.helpers.entityfilter import (
     convert_include_exclude_filter,
 )
 from homeassistant.helpers.typing import ConfigType
+from questdb.ingress import Protocol, Sender
 
 from .const import (
     CONF_AUTH,
@@ -39,7 +40,6 @@ from .event_handling import (
     put_event_to_queue,
 )
 from .io import insert_event_data_into_questdb
-from questdb.ingress import Protocol, Sender
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -187,9 +187,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         while True:
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
-            insert_event_data_into_questdb(
-                self.sender, event, self.queue
-            )
+            insert_event_data_into_questdb(self.sender, event, self.queue)
 
     @callback
     def event_listener(self, event: Event) -> None:

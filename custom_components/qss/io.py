@@ -41,9 +41,7 @@ def _retry_data_insertion(sender: Sender, event: Event) -> None:
     _insert_row(sender, event)
 
 
-def insert_event_data_into_questdb(
-    sender: Sender, event: Event, queue: Queue
-) -> None:
+def insert_event_data_into_questdb(sender: Sender, event: Event, queue: Queue) -> None:
     """Insert given event data into QuestDB using reusable sender."""
     try:
         _LOGGER.debug("Inserting event: %s", event)
