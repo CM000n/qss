@@ -21,6 +21,7 @@ from homeassistant.helpers.entityfilter import (
     convert_include_exclude_filter,
 )
 from homeassistant.helpers.typing import ConfigType
+from questdb.ingress import Protocol, Sender
 
 from .const import (
     CONF_AUTH,
@@ -115,6 +116,23 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
 
         self.queue: Any = queue.Queue()
         self.qss_ready = asyncio.Future()
+        self.sender = None
+
+    def _create_sender(self) -> None:
+        """Create the QuestDB sender based on authentication settings."""
+        if self.auth[0]:  # Check if auth_kid exists (authenticated)
+            self.sender = Sender(
+                Protocol.Tcps,
+                self.host,
+                self.port,
+                username=self.auth[0],
+                token=self.auth[1],
+                token_x=self.auth[2],
+                token_y=self.auth[3],
+                tls_verify=self.auth[4],
+            )
+        else:
+            self.sender = Sender(Protocol.Tcp, self.host, self.port)
 
     @callback
     def async_initialize(self) -> None:
@@ -136,6 +154,10 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                 if not hass_started.done():
                     hass_started.set_result(shutdown_task)
                 self.queue.put(None)
+                # Close the sender when shutting down
+                if self.sender:
+                    self.sender.close()
+                    self.sender = None
                 self.join()
 
             self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, shutdown)
@@ -159,12 +181,13 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         if result is shutdown_task:
             return
 
+        # Create the sender once at the start
+        self._create_sender()
+
         while True:
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
-            insert_event_data_into_questdb(
-                self.host, self.port, self.auth, event, self.queue
-            )
+            insert_event_data_into_questdb(self.sender, event, self.queue)
 
     @callback
     def event_listener(self, event: Event) -> None:
