@@ -17,7 +17,7 @@ jobs:
     name: HACS
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: HACS validation
         uses: hacs/action@main
         with:
@@ -28,6 +28,6 @@ jobs:
     name: Hassfest
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Hassfest validation
         uses: home-assistant/actions/hassfest@master
