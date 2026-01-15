@@ -117,6 +117,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         self.queue: Any = queue.Queue()
         self.qss_ready = asyncio.Future()
         self.sender = None
+        self.shutdown_event = threading.Event()
 
     def _create_sender(self) -> None:
         """Create the QuestDB sender based on authentication settings."""
@@ -153,12 +154,14 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                 """Shut down the qss."""
                 if not hass_started.done():
                     hass_started.set_result(shutdown_task)
+                # Signal shutdown before closing
+                self.shutdown_event.set()
                 self.queue.put(None)
-                # Close the sender when shutting down
+                self.join()
+                # Close the sender after thread has finished
                 if self.sender:
                     self.sender.close()
                     self.sender = None
-                self.join()
 
             self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, shutdown)
 
@@ -187,6 +190,9 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         while True:
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
+            # Check if shutdown is in progress
+            if self.shutdown_event.is_set():
+                break
             insert_event_data_into_questdb(self.sender, event, self.queue)
 
     @callback
