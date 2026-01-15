@@ -44,8 +44,13 @@ def _retry_data_insertion(sender: Sender, event: Event) -> None:
 def insert_event_data_into_questdb(sender: Sender, event: Event, queue: Queue) -> None:
     """Insert given event data into QuestDB using reusable sender."""
     try:
+        # Check if sender is still valid
+        if sender is None:
+            _LOGGER.warning("Sender is not available, skipping event.")
+            queue.task_done()
+            return
         _LOGGER.debug("Inserting event: %s", event)
         _retry_data_insertion(sender, event)
     except IngressError:
-        _LOGGER.exception("Failed to insert event data into QuestDB")
+        _LOGGER.exception("Failed to insert event data into QuestDB.")
     queue.task_done()
