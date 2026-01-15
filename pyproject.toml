@@ -13,7 +13,7 @@ keywords = [
 dynamic = ["version", "dependencies"]
 readme = "README.md"
 authors = [{name = "CM000n"}]
-requires-python = '>=3.12,<3.14'
+requires-python = '>=3.13.2,<3.14'
 
 [tool.poetry]
 version = "v0.1.0"
@@ -21,13 +21,13 @@ package-mode = false
 requires-poetry = '>=2.0,<3.0'
 
 [tool.poetry.dependencies]
-homeassistant = "^2025"
+homeassistant = "^2026"
 questdb = "^4.0.0"
 tenacity = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]
 voluptuous-stubs = "^0.1"
-homeassistant-stubs = "^2025"
+homeassistant-stubs = "^2026"
 pre-commit = "^4.0.0"
 
 [build-system]
