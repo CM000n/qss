@@ -31,10 +31,21 @@ def _insert_row(sender: Sender, event: Event) -> None:
     sender.flush()
 
 
+def _should_retry_error(exception: Exception) -> bool:
+    """Determine if an IngressError should be retried."""
+    # Don't retry if the sender is closed
+    if isinstance(exception, IngressError):
+        error_msg = str(exception).lower()
+        if "sender is closed" in error_msg or "closed" in error_msg:
+            return False
+        return True
+    return False
+
+
 @retry(
     stop=stop_after_attempt(RETRY_ATTEMPTS),
     wait=wait_fixed(RETRY_WAIT_SECONDS),
-    retry=retry_if_exception_type(IngressError),
+    retry=_should_retry_error,
 )
 def _retry_data_insertion(sender: Sender, event: Event) -> None:
     """Use a retry for inserting event data into QuestDB."""
@@ -44,13 +55,16 @@ def _retry_data_insertion(sender: Sender, event: Event) -> None:
 def insert_event_data_into_questdb(sender: Sender, event: Event, queue: Queue) -> None:
     """Insert given event data into QuestDB using reusable sender."""
     try:
-        # Check if sender is still valid
+        # Check if sender is still valid and not closed
         if sender is None:
             _LOGGER.warning("Sender is not available, skipping event.")
             queue.task_done()
             return
         _LOGGER.debug("Inserting event: %s", event)
         _retry_data_insertion(sender, event)
-    except IngressError:
-        _LOGGER.exception("Failed to insert event data into QuestDB.")
-    queue.task_done()
+    except IngressError as err:
+        _LOGGER.exception("Failed to insert event data into QuestDB: %s", err)
+    except Exception as err:
+        _LOGGER.exception("Unexpected error inserting event data: %s", err)
+    finally:
+        queue.task_done()
