@@ -6,7 +6,7 @@ from queue import Queue
 
 from homeassistant.core import Event
 from questdb.ingress import IngressError, Sender
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 from .const import RETRY_ATTEMPTS, RETRY_WAIT_SECONDS
 
