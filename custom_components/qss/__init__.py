@@ -2,6 +2,7 @@
 
 import asyncio
 import concurrent.futures
+import contextlib
 import logging
 import queue
 import threading
@@ -21,7 +22,7 @@ from homeassistant.helpers.entityfilter import (
     convert_include_exclude_filter,
 )
 from homeassistant.helpers.typing import ConfigType
-from questdb.ingress import Protocol, Sender
+from questdb.ingress import IngressError, Protocol, Sender
 
 from .const import (
     CONF_AUTH,
@@ -117,33 +118,82 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         self.queue: Any = queue.Queue()
         self.qss_ready = asyncio.Future()
         self.sender = None
+        self.sender_lock = threading.Lock()
         self.shutdown_event = threading.Event()
 
     def _create_sender(self) -> None:
         """Create the QuestDB sender based on authentication settings."""
-        if self.auth[0]:  # Check if auth_kid exists (authenticated)
-            self.sender = Sender(
-                Protocol.Tcps,
-                self.host,
-                self.port,
-                username=self.auth[0],
-                token=self.auth[1],
-                token_x=self.auth[2],
-                token_y=self.auth[3],
-                tls_verify=self.auth[4],
-            )
-        else:
-            self.sender = Sender(Protocol.Tcp, self.host, self.port)
+        with self.sender_lock:
+            # Close existing sender if any
+            if self.sender is not None:
+                with contextlib.suppress(Exception):
+                    self.sender.close()
+
+            if self.auth[0]:  # Check if auth_kid exists (authenticated)
+                self.sender = Sender(
+                    Protocol.Tcps,
+                    self.host,
+                    self.port,
+                    username=self.auth[0],
+                    token=self.auth[1],
+                    token_x=self.auth[2],
+                    token_y=self.auth[3],
+                    tls_verify=self.auth[4],
+                )
+            else:
+                self.sender = Sender(Protocol.Tcp, self.host, self.port)
+            _LOGGER.info("QuestDB sender created successfully")
+
+    def _ensure_sender(self) -> bool:
+        """Ensure sender is available and create if needed."""
+        if self.shutdown_event.is_set():
+            return False
+
+        with self.sender_lock:
+            if self.sender is None:
+                try:
+                    self._create_sender()
+                except Exception:
+                    _LOGGER.exception("Failed to create sender: %s")
+                    return False
+
+        return self.sender is not None
+
+    def _insert_event(self, event: Event) -> None:
+        """Insert event with proper error handling and sender reset."""
+        try:
+            _LOGGER.debug("Inserting event: %s", event)
+
+            with self.sender_lock:
+                if self.sender is None:
+                    _LOGGER.warning("Sender became unavailable, skipping event.")
+                    return
+
+                insert_event_data_into_questdb(self.sender, event, self.queue)
+        except IngressError as err:
+            error_msg = str(err).lower()
+            if "closed" in error_msg:
+                _LOGGER.exception(
+                    "Sender is closed. Invalidating sender for reconnection."
+                )
+                with self.sender_lock:
+                    self.sender = None
+            else:
+                _LOGGER.exception("Failed to insert event data: %s")
+        except Exception:
+            _LOGGER.exception("Unexpected error inserting event data: %s")
+        finally:
+            self.queue.task_done()
 
     @callback
     def async_initialize(self) -> None:
         """Initialize qss."""
         self.hass.bus.async_listen(EVENT_STATE_CHANGED, self.event_listener)
 
-    def run(self) -> None:
+    def run(self) -> None:  # noqa : C901
         """Run qss and insert data."""
         shutdown_task = object()
-        hass_started = concurrent.futures.Future()
+        hass_started: concurrent.futures.Future[Any] = concurrent.futures.Future()
 
         @callback
         def register() -> None:
@@ -161,13 +211,14 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                 # Wait for the thread to finish processing
                 self.join(timeout=10.0)
                 # Close the sender after thread has finished
-                if self.sender:
-                    try:
-                        self.sender.close()
-                    except Exception as err:
-                        _LOGGER.warning("Error closing sender: %s", err)
-                    finally:
-                        self.sender = None
+                with self.sender_lock:
+                    if self.sender:
+                        try:
+                            self.sender.close()
+                        except Exception:  # noqa : BLE001
+                            _LOGGER.warning("Error closing sender: %s")
+                        finally:
+                            self.sender = None
 
             self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, shutdown)
 
@@ -199,7 +250,15 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             # Check if shutdown is in progress before attempting insert
             if self.shutdown_event.is_set() or event is None:
                 break
-            insert_event_data_into_questdb(self.sender, event, self.queue)
+
+            # Ensure sender is available before processing
+            if not self._ensure_sender():
+                _LOGGER.warning("Sender not available, skipping event")
+                self.queue.task_done()
+                continue
+
+            # Pass self to allow sender reset on error
+            self._insert_event(event)
 
     @callback
     def event_listener(self, event: Event) -> None:

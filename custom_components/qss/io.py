@@ -36,9 +36,7 @@ def _should_retry_error(exception: Exception) -> bool:
     # Don't retry if the sender is closed
     if isinstance(exception, IngressError):
         error_msg = str(exception).lower()
-        if "sender is closed" in error_msg or "closed" in error_msg:
-            return False
-        return True
+        return "sender is closed" not in error_msg and "closed" not in error_msg
     return False
 
 
@@ -49,22 +47,22 @@ def _should_retry_error(exception: Exception) -> bool:
 )
 def _retry_data_insertion(sender: Sender, event: Event) -> None:
     """Use a retry for inserting event data into QuestDB."""
-    _insert_row(sender, event)
-
-
-def insert_event_data_into_questdb(sender: Sender, event: Event, queue: Queue) -> None:
-    """Insert given event data into QuestDB using reusable sender."""
     try:
-        # Check if sender is still valid and not closed
-        if sender is None:
-            _LOGGER.warning("Sender is not available, skipping event.")
-            queue.task_done()
-            return
-        _LOGGER.debug("Inserting event: %s", event)
-        _retry_data_insertion(sender, event)
+        _insert_row(sender, event)
     except IngressError as err:
-        _LOGGER.exception("Failed to insert event data into QuestDB: %s", err)
-    except Exception as err:
-        _LOGGER.exception("Unexpected error inserting event data: %s", err)
-    finally:
-        queue.task_done()
+        # If sender is closed, we can't retry
+        error_msg = str(err).lower()
+        if "closed" in error_msg:
+            _LOGGER.exception("Sender is closed, cannot insert data")
+            msg = "Sender is closed"
+            raise RuntimeError(msg) from err
+        raise
+
+
+def insert_event_data_into_questdb(sender: Sender, event: Event, queue: Queue) -> None:  # noqa: ARG001
+    """Insert given event data into QuestDB using reusable sender."""
+    if sender is None:
+        _LOGGER.warning("Sender is not available, skipping event.")
+        return
+
+    _retry_data_insertion(sender, event)
