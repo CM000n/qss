@@ -36,7 +36,7 @@ jobs:
         run: |
           pyproject_version=$(poetry version | awk '{print $2}')
           echo "pyproject.toml version: $pyproject_version"
-          manifest_version=$(jq -r '.version' custom_components/qss/manifest.json)
+          manifest_version=$(jq -r '.version' custom_components/qss/manifest.json | sed 's/^v//')
           echo "manifest.json version: $manifest_version"
           if [[ "$pyproject_version" != "$manifest_version" ]]; then
             echo "Error: Version mismatch between pyproject.toml ($pyproject_version) and manifest.json ($manifest_version)"
