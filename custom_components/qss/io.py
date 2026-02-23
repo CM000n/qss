@@ -5,12 +5,29 @@ from json import dumps
 from queue import Queue
 
 from homeassistant.core import Event
-from questdb.ingress import IngressError, Sender
-from tenacity import retry, stop_after_attempt, wait_fixed
+from questdb.ingress import IngressError, Protocol, Sender
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 from .const import RETRY_ATTEMPTS, RETRY_WAIT_SECONDS
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _create_sender(host: str, port: int, auth: tuple) -> Sender:
+    """Create a QuestDB Sender based on authentication settings."""
+    auth_kid, auth_d_key, auth_x_key, auth_y_key, auth_ssl_check = auth
+    if auth_kid:  # Authenticated
+        return Sender(
+            Protocol.Tcps,
+            host,
+            port,
+            username=auth_kid,
+            token=auth_d_key,
+            token_x=auth_x_key,
+            token_y=auth_y_key,
+            tls_verify=auth_ssl_check,
+        )
+    return Sender(Protocol.Tcp, host, port)
 
 
 def _insert_row(sender: Sender, event: Event) -> None:
@@ -27,44 +44,27 @@ def _insert_row(sender: Sender, event: Event) -> None:
         },
         at=event.time_fired,
     )
-
     sender.flush()
-
-
-def _should_retry_error(exception: Exception) -> bool:
-    """Determine if an IngressError should be retried."""
-    # Don't retry if the sender is closed
-    if isinstance(exception, IngressError):
-        error_msg = str(exception).lower()
-        if "sender is closed" in error_msg or "closed" in error_msg:
-            return False
-        return True
-    return False
 
 
 @retry(
     stop=stop_after_attempt(RETRY_ATTEMPTS),
     wait=wait_fixed(RETRY_WAIT_SECONDS),
-    retry=_should_retry_error,
+    retry=retry_if_exception_type(IngressError),
 )
-def _retry_data_insertion(sender: Sender, event: Event) -> None:
+def _retry_data_insertion(host: str, port: int, auth: tuple, event: Event) -> None:
     """Use a retry for inserting event data into QuestDB."""
-    _insert_row(sender, event)
+    with _create_sender(host, port, auth) as sender:
+        _insert_row(sender, event)
 
 
-def insert_event_data_into_questdb(sender: Sender, event: Event, queue: Queue) -> None:
-    """Insert given event data into QuestDB using reusable sender."""
+def insert_event_data_into_questdb(
+    host: str, port: int, auth: tuple, event: Event, queue: Queue
+) -> None:
+    """Insert given event data into QuestDB using a context-managed sender."""
     try:
-        # Check if sender is still valid and not closed
-        if sender is None:
-            _LOGGER.warning("Sender is not available, skipping event.")
-            queue.task_done()
-            return
         _LOGGER.debug("Inserting event: %s", event)
-        _retry_data_insertion(sender, event)
-    except IngressError as err:
-        _LOGGER.exception("Failed to insert event data into QuestDB: %s", err)
-    except Exception as err:
-        _LOGGER.exception("Unexpected error inserting event data: %s", err)
-    finally:
-        queue.task_done()
+        _retry_data_insertion(host, port, auth, event)
+    except IngressError:
+        _LOGGER.exception("Failed to insert event data into QuestDB.")
+    queue.task_done()

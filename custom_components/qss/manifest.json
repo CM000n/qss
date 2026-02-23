@@ -6,6 +6,6 @@
   "documentation": "https://github.com/CM000n/QSS",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/CM000n/QSS/issues",
-  "requirements": ["questdb>=2.0.4", "tenacity>=9.0"],
-  "version": "v0.1.1"
+  "requirements": ["questdb>=4.1.0", "tenacity>=9.0"],
+  "version": "v0.1.2"
 }
