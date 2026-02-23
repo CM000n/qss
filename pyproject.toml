@@ -16,13 +16,13 @@ authors = [{name = "CM000n"}]
 requires-python = '>=3.13.2,<3.14'
 
 [tool.poetry]
-version = "v0.1.1"
+version = "v0.1.2"
 package-mode = false
 requires-poetry = '>=2.0,<3.0'
 
 [tool.poetry.dependencies]
 homeassistant = "^2026"
-questdb = "^4.0.0"
+questdb = "^4.1.0"
 tenacity = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]

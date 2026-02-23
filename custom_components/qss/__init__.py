@@ -21,7 +21,6 @@ from homeassistant.helpers.entityfilter import (
     convert_include_exclude_filter,
 )
 from homeassistant.helpers.typing import ConfigType
-from questdb.ingress import Protocol, Sender
 
 from .const import (
     CONF_AUTH,
@@ -116,24 +115,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
 
         self.queue: Any = queue.Queue()
         self.qss_ready = asyncio.Future()
-        self.sender = None
         self.shutdown_event = threading.Event()
-
-    def _create_sender(self) -> None:
-        """Create the QuestDB sender based on authentication settings."""
-        if self.auth[0]:  # Check if auth_kid exists (authenticated)
-            self.sender = Sender(
-                Protocol.Tcps,
-                self.host,
-                self.port,
-                username=self.auth[0],
-                token=self.auth[1],
-                token_x=self.auth[2],
-                token_y=self.auth[3],
-                tls_verify=self.auth[4],
-            )
-        else:
-            self.sender = Sender(Protocol.Tcp, self.host, self.port)
 
     @callback
     def async_initialize(self) -> None:
@@ -154,20 +136,10 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
                 """Shut down the qss."""
                 if not hass_started.done():
                     hass_started.set_result(shutdown_task)
-                # Signal shutdown before closing
+                # Signal shutdown
                 self.shutdown_event.set()
-                # Add sentinel value to wake up the thread if it's waiting
                 self.queue.put(None)
-                # Wait for the thread to finish processing
-                self.join(timeout=10.0)
-                # Close the sender after thread has finished
-                if self.sender:
-                    try:
-                        self.sender.close()
-                    except Exception as err:
-                        _LOGGER.warning("Error closing sender: %s", err)
-                    finally:
-                        self.sender = None
+                self.join()
 
             self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, shutdown)
 
@@ -190,16 +162,15 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         if result is shutdown_task:
             return
 
-        # Create the sender once at the start
-        self._create_sender()
-
         while True:
             event = get_event_from_queue(self.queue)
             finish_task_if_empty_event(event, self.queue)
-            # Check if shutdown is in progress before attempting insert
-            if self.shutdown_event.is_set() or event is None:
+            # Check if shutdown is in progress
+            if self.shutdown_event.is_set():
                 break
-            insert_event_data_into_questdb(self.sender, event, self.queue)
+            insert_event_data_into_questdb(
+                self.host, self.port, self.auth, event, self.queue
+            )
 
     @callback
     def event_listener(self, event: Event) -> None:
