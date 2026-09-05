@@ -52,18 +52,23 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     steps:
       # custom_components/qss/manifest.json and pyproject.toml are only
       # bumped in the ephemeral checkout used to build the release zip
       # above, so the version committed to git keeps drifting away from
       # the actually published release. This job closes that gap by
-      # opening a small pull request that brings both files back in sync
-      # with the release that just got published.
+      # pushing the version bump straight to main.
+      #
+      # main requires a reviewed pull request for the default
+      # GITHUB_TOKEN, but repo admins are exempt from that rule, so this
+      # checks out and pushes using RELEASE_MAIN_PUSH_TOKEN, a
+      # fine-grained PAT (Contents: Read and write only) belonging to a
+      # repo admin, kept as a repository secret.
       - name: ⤵️ Check out main
         uses: actions/checkout@v7
         with:
           ref: main
+          token: ${{ secrets.RELEASE_MAIN_PUSH_TOKEN }}
 
       - name: 🔢 Determine released version
         id: version
@@ -97,26 +102,15 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: 📬 Open pull request
+      - name: ⬆️ Push version bump to main
         if: steps.bump.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           version="${{ steps.version.outputs.value }}"
-          branch="chore/sync-version-${version}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "${branch}"
           git add custom_components/qss/manifest.json pyproject.toml
           git commit -m "chore: sync version to ${version} after release"
-          git push --force origin "${branch}"
-
-          if [ -z "$(gh pr list --head "${branch}" --state open --json number --jq '.[0].number')" ]; then
-            gh pr create \
-              --title "chore: sync version to ${version} after release" \
-              --body "Automated follow-up to the [\`${{ github.event.release.tag_name }}\`](${{ github.event.release.html_url }}) release: keeps the \`version\` fields in \`custom_components/qss/manifest.json\` and \`pyproject.toml\` in sync with the latest published release, so they no longer drift apart from what users actually installed. Please review and merge — branch protection on \`main\` requires it." \
-              --base main \
-              --head "${branch}"
-          fi
+          git pull --rebase origin main
+          git push origin HEAD:main
