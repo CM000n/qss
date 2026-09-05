@@ -141,7 +141,7 @@ The data is stored in a QuestDB table named `qss` by default (configurable via `
 
 ## Development
 
-QSS uses [Poetry](https://python-poetry.org/) for dependency management and [pytest](https://pytest.org/) (via [`pytest-homeassistant-custom-component`](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component)) for testing.
+QSS uses [Poetry](https://python-poetry.org/) for dependency management and [pytest](https://pytest.org/) (via [`pytest-homeassistant-custom-component`](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component)) for testing. It requires Python 3.14+, matching the Python version required by current Home Assistant releases.
 
 ```bash
 # Install dependencies (including dev/test dependencies)

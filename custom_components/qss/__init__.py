@@ -5,8 +5,7 @@ import concurrent.futures
 import logging
 import queue
 import threading
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -20,7 +19,6 @@ from homeassistant.helpers.entityfilter import (
     INCLUDE_EXCLUDE_BASE_FILTER_SCHEMA,
     convert_include_exclude_filter,
 )
-from homeassistant.helpers.typing import ConfigType
 
 from .const import (
     CONF_AUTH,
@@ -41,6 +39,11 @@ from .event_handling import (
     put_event_to_queue,
 )
 from .io import QuestDBAuth, QuestDBConfig, insert_event_data_into_questdb
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from homeassistant.helpers.typing import ConfigType
 
 _LOGGER = logging.getLogger(__name__)
 

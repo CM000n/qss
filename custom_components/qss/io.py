@@ -3,13 +3,17 @@
 import logging
 from dataclasses import dataclass, field
 from json import dumps
-from queue import Queue
+from typing import TYPE_CHECKING
 
-from homeassistant.core import Event
 from questdb.ingress import IngressError, Protocol, Sender
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 from .const import DEFAULT_TABLE_NAME, RETRY_ATTEMPTS, RETRY_WAIT_SECONDS
+
+if TYPE_CHECKING:
+    from queue import Queue
+
+    from homeassistant.core import Event
 
 _LOGGER = logging.getLogger(__name__)
 
