@@ -7,6 +7,7 @@ import queue
 from homeassistant.const import STATE_UNKNOWN
 
 from custom_components.qss.event_handling import (
+    QUEUE_POLL_TIMEOUT,
     finish_task_if_empty_event,
     get_event_from_queue,
     put_event_to_queue,
@@ -62,6 +63,13 @@ def test_get_event_from_queue_returns_queued_event() -> None:
     event_queue.put(event)
 
     assert get_event_from_queue(event_queue) is event
+
+
+def test_get_event_from_queue_returns_timeout_sentinel_when_empty() -> None:
+    """Polling an empty queue with a timeout should return the timeout sentinel."""
+    event_queue: queue.Queue = queue.Queue()
+
+    assert get_event_from_queue(event_queue, timeout=0.01) is QUEUE_POLL_TIMEOUT
 
 
 def test_finish_task_if_empty_event_marks_task_done_for_none() -> None:

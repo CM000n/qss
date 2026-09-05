@@ -74,6 +74,14 @@ Enables the qss integration. Only allowed once.
   (string)(Optional)
   The name of the QuestDB table QSS should store the state data in. Defaults to `qss`. Useful if you want to keep multiple Home Assistant instances or environments separated within the same QuestDB.
 
+  max_batch_size:
+  (int)(Optional)
+  QSS keeps a single, persistent connection to QuestDB open and reuses it for many events instead of opening a new connection per event. Rows are buffered and only sent to QuestDB once this many rows have accumulated (or once `flush_interval_seconds` has elapsed, whichever happens first). Defaults to `500`.
+
+  flush_interval_seconds:
+  (int)(Optional)
+  The maximum number of seconds buffered rows may stay unflushed before being sent to QuestDB, even if `max_batch_size` has not yet been reached. Defaults to `5`.
+
   authentication:
   (dict)(Optional)
   Under this entry you can, if desired, enter the authenication parameters necessary for your Quest DB installation. The entry is completely optional if your Quest DB installation does not have any additional authentication settings. Keep in mind that this authentication needs an SSL setup, either from QuestDB Enterprise or a reverse proxy.

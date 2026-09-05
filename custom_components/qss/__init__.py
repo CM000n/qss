@@ -27,18 +27,28 @@ from .const import (
     CONF_AUTH_SSL_CHECK,
     CONF_AUTH_X_KEY,
     CONF_AUTH_Y_KEY,
+    CONF_FLUSH_INTERVAL_SECONDS,
     CONF_HOST,
+    CONF_MAX_BATCH_SIZE,
     CONF_PORT,
     CONF_TABLE_NAME,
+    DEFAULT_FLUSH_INTERVAL_SECONDS,
+    DEFAULT_MAX_BATCH_SIZE,
     DEFAULT_TABLE_NAME,
     DOMAIN,
 )
 from .event_handling import (
+    QUEUE_POLL_TIMEOUT,
     finish_task_if_empty_event,
     get_event_from_queue,
     put_event_to_queue,
 )
-from .io import QuestDBAuth, QuestDBConfig, insert_event_data_into_questdb
+from .io import (
+    QuestDBAuth,
+    QuestDBConfig,
+    QuestDBConnection,
+    insert_event_data_into_questdb,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -66,6 +76,12 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Required(CONF_HOST): cv.string,
                 vol.Required(CONF_PORT): cv.positive_int,
                 vol.Optional(CONF_TABLE_NAME, default=DEFAULT_TABLE_NAME): cv.string,
+                vol.Optional(
+                    CONF_MAX_BATCH_SIZE, default=DEFAULT_MAX_BATCH_SIZE
+                ): cv.positive_int,
+                vol.Optional(
+                    CONF_FLUSH_INTERVAL_SECONDS, default=DEFAULT_FLUSH_INTERVAL_SECONDS
+                ): cv.positive_int,
                 vol.Optional(CONF_AUTH, default={}): AUTHENTICATION_SCHEMA,
             }
         )
@@ -81,6 +97,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     db_host = str(conf.get(CONF_HOST))
     db_port = int(conf.get(CONF_PORT))
     db_table_name = str(conf.get(CONF_TABLE_NAME))
+    db_max_batch_size = int(conf.get(CONF_MAX_BATCH_SIZE))
+    db_flush_interval_seconds = int(conf.get(CONF_FLUSH_INTERVAL_SECONDS))
 
     entity_filter = convert_include_exclude_filter(conf)
 
@@ -92,7 +110,12 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         ssl_check=conf.get(CONF_AUTH).get(CONF_AUTH_SSL_CHECK),
     )
     db_config = QuestDBConfig(
-        host=db_host, port=db_port, table_name=db_table_name, auth=db_auth
+        host=db_host,
+        port=db_port,
+        table_name=db_table_name,
+        auth=db_auth,
+        max_batch_size=db_max_batch_size,
+        flush_interval_seconds=db_flush_interval_seconds,
     )
 
     instance = QuestDB(hass=hass, entity_filter=entity_filter, config=db_config)
@@ -167,13 +190,29 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
         if result is shutdown_task:
             return
 
-        while True:
-            event = get_event_from_queue(self.queue)
-            finish_task_if_empty_event(event, self.queue)
-            # Check if shutdown is in progress
-            if self.shutdown_event.is_set():
-                break
-            insert_event_data_into_questdb(self.config, event, self.queue)
+        # A single, long-lived connection is reused across all events instead
+        # of opening a new one per event. The `finally` guarantees any
+        # buffered-but-unflushed rows are flushed and the connection is
+        # closed cleanly on every exit path, including shutdown.
+        connection = QuestDBConnection(self.config)
+        try:
+            while True:
+                event = get_event_from_queue(
+                    self.queue, timeout=self.config.flush_interval_seconds
+                )
+                finish_task_if_empty_event(event, self.queue)
+                # Check if shutdown is in progress
+                if self.shutdown_event.is_set():
+                    break
+                if event is QUEUE_POLL_TIMEOUT:
+                    # No new event arrived within the flush interval: flush
+                    # any buffered rows so they don't sit unflushed for long
+                    # during quiet periods.
+                    connection.flush_if_due()
+                    continue
+                insert_event_data_into_questdb(connection, event, self.queue)
+        finally:
+            connection.close()
 
     @callback
     def event_listener(self, event: Event) -> None:

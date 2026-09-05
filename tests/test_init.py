@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import threading
 from collections.abc import Callable
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 import voluptuous as vol
@@ -14,7 +15,11 @@ from homeassistant.helpers.entityfilter import convert_include_exclude_filter
 from homeassistant.setup import async_setup_component
 
 from custom_components.qss import CONFIG_SCHEMA, QuestDB
-from custom_components.qss.const import DOMAIN
+from custom_components.qss.const import (
+    DEFAULT_FLUSH_INTERVAL_SECONDS,
+    DEFAULT_MAX_BATCH_SIZE,
+    DOMAIN,
+)
 from custom_components.qss.io import QuestDBConfig
 
 MINIMAL_CONFIG = {DOMAIN: {"host": "localhost", "port": 9009}}
@@ -31,8 +36,8 @@ def mock_insert() -> Callable:
     processed = threading.Event()
     calls: list[tuple] = []
 
-    def _fake_insert(config, event, event_queue) -> None:  # noqa: ANN001
-        calls.append((config, event))
+    def _fake_insert(connection, event, event_queue) -> None:  # noqa: ANN001
+        calls.append((connection, event))
         event_queue.task_done()
         processed.set()
 
@@ -73,9 +78,9 @@ async def test_included_entity_state_change_is_forwarded(
 
     assert mock_insert.processed.wait(timeout=5)
     assert len(mock_insert.calls) == 1
-    config, event = mock_insert.calls[0]
+    connection, event = mock_insert.calls[0]
     assert event.data["entity_id"] == "sensor.temperature"
-    assert config.table_name == "qss"
+    assert connection.config.table_name == "qss"
 
 
 async def test_excluded_domain_state_change_is_not_forwarded(
@@ -114,8 +119,8 @@ async def test_custom_table_name_is_forwarded_to_io_layer(
     await hass.async_block_till_done()
 
     assert mock_insert.processed.wait(timeout=5)
-    config, _ = mock_insert.calls[0]
-    assert config.table_name == "my_custom_table"
+    connection, _ = mock_insert.calls[0]
+    assert connection.config.table_name == "my_custom_table"
 
 
 async def test_thread_exits_cleanly_when_hass_stops_before_starting(
@@ -144,6 +149,90 @@ async def test_thread_exits_cleanly_when_hass_stops_before_starting(
 
     instance.join(timeout=5)
     assert not instance.is_alive()
+
+
+async def test_flush_on_shutdown_flushes_and_closes_sender(hass: HomeAssistant) -> None:
+    """Buffered rows must be flushed and the connection closed on shutdown.
+
+    Uses a very large ``flush_interval_seconds`` so the only flush that can
+    happen is the one triggered by the shutdown path, not the idle poll.
+    """
+    sender = MagicMock()
+    config = {
+        DOMAIN: {
+            "host": "localhost",
+            "port": 9009,
+            "flush_interval_seconds": 3600,
+            "include": {"domains": ["sensor"]},
+        }
+    }
+
+    with patch("custom_components.qss.io._create_sender", return_value=sender):
+        assert await async_setup_component(hass, DOMAIN, config)
+        await hass.async_block_till_done()
+
+        hass.states.async_set("sensor.temperature", "21.5")
+        await hass.async_block_till_done()
+
+        # Give the background thread a brief moment to pick up the queued
+        # event before triggering shutdown.
+        for _ in range(50):
+            if sender.row.called:
+                break
+            await asyncio.sleep(0.1)
+        assert sender.row.called
+        sender.flush.assert_not_called()
+
+        hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
+        await hass.async_block_till_done()
+
+    sender.close.assert_called_once_with(flush=True)
+
+
+async def test_idle_poll_flushes_buffered_rows_via_flush_interval(
+    hass: HomeAssistant,
+) -> None:
+    """When idle, the background thread must flush buffered rows itself.
+
+    Exercises the ``QUEUE_POLL_TIMEOUT`` branch of ``QuestDB.run`` by using a
+    very small ``flush_interval_seconds`` and a large ``max_batch_size`` so
+    the only way to flush is via the idle poll timeout, not the batch-size
+    threshold.
+    """
+    sender = MagicMock()
+    config = {
+        DOMAIN: {
+            "host": "localhost",
+            "port": 9009,
+            "flush_interval_seconds": 1,
+            "max_batch_size": 1000,
+            "include": {"domains": ["sensor"]},
+        }
+    }
+
+    with patch("custom_components.qss.io._create_sender", return_value=sender):
+        assert await async_setup_component(hass, DOMAIN, config)
+        await hass.async_block_till_done()
+
+        hass.states.async_set("sensor.temperature", "21.5")
+        await hass.async_block_till_done()
+
+        for _ in range(50):
+            if sender.row.called:
+                break
+            await asyncio.sleep(0.1)
+        assert sender.row.called
+        sender.flush.assert_not_called()
+
+        for _ in range(50):
+            if sender.flush.called:
+                break
+            await asyncio.sleep(0.1)
+
+        hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
+        await hass.async_block_till_done()
+
+    sender.flush.assert_called_once()
 
 
 def test_config_schema_requires_host_and_port() -> None:
@@ -206,3 +295,28 @@ def test_config_schema_accepts_full_configuration() -> None:
     assert config[DOMAIN]["host"] == "192.168.178.3"
     assert config[DOMAIN]["port"] == 9009
     assert config[DOMAIN]["authentication"]["kid"] == "my_kid"
+
+
+def test_config_schema_defaults_batching_settings() -> None:
+    """Omitting the batching settings should fall back to their defaults."""
+    config = CONFIG_SCHEMA(MINIMAL_CONFIG)
+
+    assert config[DOMAIN]["max_batch_size"] == DEFAULT_MAX_BATCH_SIZE
+    assert config[DOMAIN]["flush_interval_seconds"] == DEFAULT_FLUSH_INTERVAL_SECONDS
+
+
+def test_config_schema_accepts_custom_batching_settings() -> None:
+    """Configured batching settings should be preserved as-is."""
+    config = CONFIG_SCHEMA(
+        {
+            DOMAIN: {
+                "host": "localhost",
+                "port": 9009,
+                "max_batch_size": 50,
+                "flush_interval_seconds": 30,
+            }
+        }
+    )
+
+    assert config[DOMAIN]["max_batch_size"] == 50
+    assert config[DOMAIN]["flush_interval_seconds"] == 30

@@ -7,8 +7,12 @@ ISSUES_URL = "https://github.com/CM000n/qss/issues"
 CONF_HOST = "host"
 CONF_PORT = "port"
 CONF_TABLE_NAME = "table_name"
+CONF_MAX_BATCH_SIZE = "max_batch_size"
+CONF_FLUSH_INTERVAL_SECONDS = "flush_interval_seconds"
 
 DEFAULT_TABLE_NAME = "qss"
+DEFAULT_MAX_BATCH_SIZE = 500
+DEFAULT_FLUSH_INTERVAL_SECONDS = 5
 
 CONF_AUTH = "authentication"
 CONF_AUTH_SSL_CHECK = "ssl_check"
