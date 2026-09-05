@@ -27,9 +27,10 @@ Manual:
 
 - Copy the `qss` folder in the `custom_components` folder of this repository into the `custom_components` folder of your Home Assistant installation.
 
-Automatic:
+Automatic (via [HACS](https://hacs.xyz/)):
 
-- Add this repository as a custom repository to your [HACS](https://hacs.xyz/) installation. You can then install QSS via HACS. Full HACS compatibility and inclusion in the official HACS repo collection is planned for the future.
+- QSS is part of the official HACS default repository collection, so it can be installed directly without adding a custom repository first: open HACS, search for "QuestDB State Storage (QSS)" and install it from there.
+- Alternatively, you can still add this repository as a custom repository to your HACS installation if you want to track a specific branch or fork.
 
 configuration.yaml
 
