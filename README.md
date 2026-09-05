@@ -1,17 +1,44 @@
 <div align="center">
   <a href="https://questdb.io/" target="blank"><img alt="QuestDB Logo" src="https://questdb.io/img/questdb-logo-themed.svg" width="305px"/></a>
-</div>
 
-# QuestDB state storage (QSS) custom component for Home Assistant
+  <h1>QuestDB State Storage (QSS)</h1>
+  <p><strong>Store your Home Assistant entity states in QuestDB — fast, async and HACS-ready.</strong></p>
+
+  [![GitHub release](https://img.shields.io/github/v/release/CM000n/qss?style=for-the-badge&logo=homeassistantcommunitystore&color=blue)](https://github.com/CM000n/qss/releases)
+  [![HACS default](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge&logo=homeassistant)](https://github.com/hacs/default)
+  [![Validate](https://img.shields.io/github/actions/workflow/status/CM000n/qss/validate.yml?branch=main&style=for-the-badge&label=Validate)](https://github.com/CM000n/qss/actions/workflows/validate.yml)
+  [![Tests](https://img.shields.io/github/actions/workflow/status/CM000n/qss/tests.yml?branch=main&style=for-the-badge&label=Tests)](https://github.com/CM000n/qss/actions/workflows/tests.yml)
+  [![License](https://img.shields.io/github/license/CM000n/qss?style=for-the-badge)](LICENSE)
+
+  [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=CM000n&repository=qss&category=integration)
+</div>
 
 QSS makes it possible to transfer state information of the Home Assistant entities simply and efficiently via InfluxDB Line Protocol into a QuestDB for long-term storage and later analysis.
 
-What ist [QuestDB](https://questdb.io/)?
+**What is [QuestDB](https://questdb.io/)?**
 [QuestDB](https://questdb.io/) is the new kid on the block of time series optimised databases and claims to be the fastest open source time series database currently available.
 QuestDB offers high throughput ingestion and real-time SQL queries for applications in a wide range of use cases. It has a tiny memory footprint and combines the best of different worlds by supporting record entry via the fast and simple InfluxDB Line protocol, while offering great compatibility for common SQL queries (PostgresSQL).
 If you want to learn more about the possibilities of QuestDB, have a look at the [documentation](https://questdb.io/docs/) or this great [Youtube video by Code to the Moon](https://www.youtube.com/watch?v=A8uMF64rbS8).
 
 QSS itself is not a replacement for the recorder component integrated in Home Assistant, but merely offers an alternative for long-term data storage.
+
+## Features
+
+- ⚡ **Persistent, batched writes** — a single, reused QuestDB connection is shared across events; rows are buffered and flushed once `max_batch_size` is reached or `flush_interval_seconds` has elapsed, whichever comes first.
+- 🔁 **Automatic retries** on transient ingestion errors, so a brief network hiccup doesn't drop your data.
+- 🎯 **Fine-grained filtering** — include or exclude specific domains, entities, or entity glob patterns (e.g. `sensor.weather_*`) from being recorded.
+- 🔒 **Optional authenticated & SSL/TLS connections**, for secured QuestDB / QuestDB Enterprise setups.
+- 🗄️ **Configurable target table**, so multiple Home Assistant instances can share the same QuestDB without colliding.
+- ✅ **Well tested** with [`pytest-homeassistant-custom-component`](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component), covering filtering, ingestion/retry behavior and the setup/shutdown lifecycle.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Details](#details)
+- [Development](#development)
+- [Credits](#credits)
+- [Disclaimer](#disclaimer)
 
 ## Installation
 
