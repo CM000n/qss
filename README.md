@@ -1,17 +1,44 @@
 <div align="center">
   <a href="https://questdb.io/" target="blank"><img alt="QuestDB Logo" src="https://questdb.io/img/questdb-logo-themed.svg" width="305px"/></a>
-</div>
 
-# QuestDB state storage (QSS) custom component for Home Assistant
+  <h1>QuestDB State Storage (QSS)</h1>
+  <p><strong>Store your Home Assistant entity states in QuestDB — fast, async and HACS-ready.</strong></p>
+
+[![GitHub release](https://img.shields.io/github/v/release/CM000n/qss?style=for-the-badge&logo=homeassistantcommunitystore&color=blue)](https://github.com/CM000n/qss/releases)
+[![HACS default](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge&logo=homeassistant)](https://github.com/hacs/default)
+[![Validate](https://img.shields.io/github/actions/workflow/status/CM000n/qss/validate.yml?branch=main&style=for-the-badge&label=Validate)](https://github.com/CM000n/qss/actions/workflows/validate.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/CM000n/qss/tests.yml?branch=main&style=for-the-badge&label=Tests)](https://github.com/CM000n/qss/actions/workflows/tests.yml)
+[![License](https://img.shields.io/github/license/CM000n/qss?style=for-the-badge)](LICENSE)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=CM000n&repository=qss&category=integration)
+</div>
 
 QSS makes it possible to transfer state information of the Home Assistant entities simply and efficiently via InfluxDB Line Protocol into a QuestDB for long-term storage and later analysis.
 
-What ist [QuestDB](https://questdb.io/)?
+**What is [QuestDB](https://questdb.io/)?**
 [QuestDB](https://questdb.io/) is the new kid on the block of time series optimised databases and claims to be the fastest open source time series database currently available.
 QuestDB offers high throughput ingestion and real-time SQL queries for applications in a wide range of use cases. It has a tiny memory footprint and combines the best of different worlds by supporting record entry via the fast and simple InfluxDB Line protocol, while offering great compatibility for common SQL queries (PostgresSQL).
 If you want to learn more about the possibilities of QuestDB, have a look at the [documentation](https://questdb.io/docs/) or this great [Youtube video by Code to the Moon](https://www.youtube.com/watch?v=A8uMF64rbS8).
 
 QSS itself is not a replacement for the recorder component integrated in Home Assistant, but merely offers an alternative for long-term data storage.
+
+## Features
+
+- ⚡ **Persistent, batched writes** — a single, reused QuestDB connection is shared across events; rows are buffered and flushed once `max_batch_size` is reached or `flush_interval_seconds` has elapsed, whichever comes first.
+- 🔁 **Automatic retries** on transient ingestion errors, so a brief network hiccup doesn't drop your data.
+- 🎯 **Fine-grained filtering** — include or exclude specific domains, entities, or entity glob patterns (e.g. `sensor.weather_*`) from being recorded.
+- 🔒 **Optional authenticated & SSL/TLS connections**, for secured QuestDB / QuestDB Enterprise setups.
+- 🗄️ **Configurable target table**, so multiple Home Assistant instances can share the same QuestDB without colliding.
+- ✅ **Well tested** with [`pytest-homeassistant-custom-component`](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component), covering filtering, ingestion/retry behavior and the setup/shutdown lifecycle.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Details](#details)
+- [Development](#development)
+- [Credits](#credits)
+- [Disclaimer](#disclaimer)
 
 ## Installation
 
@@ -27,13 +54,12 @@ Manual:
 
 - Copy the `qss` folder in the `custom_components` folder of this repository into the `custom_components` folder of your Home Assistant installation.
 
-Automatic:
+Automatic (via [HACS](https://hacs.xyz/)):
 
-- Add this repository as a custom repository to your [HACS](https://hacs.xyz/) installation. You can then install QSS via HACS. Full HACS compatibility and inclusion in the official HACS repo collection is planned for the future.
+- QSS is part of the official HACS default repository collection, so it can be installed directly without adding a custom repository first: open HACS, search for "QuestDB State Storage (QSS)" and install it from there.
+- Alternatively, you can still add this repository as a custom repository to your HACS installation if you want to track a specific branch or fork.
 
-configuration.yaml
-
-- Add an entry to your Home Assistant `configuration.yaml` that might look like this::
+Add an entry to your Home Assistant `configuration.yaml` that might look like this — see the [Configuration](#configuration) section below for all available options:
 
 ```yaml
 qss:
@@ -52,92 +78,44 @@ qss:
       - "person.john_doe"
 ```
 
-Note: Authenication details are completely optional. How to create them can be found in the Quest DB documentation at this point:
-https://questdb.io/docs/reference/api/ilp/authenticate
-
 ## Configuration
 
-```yaml
-qss:
-(map)(Required)
-Enables the qss integration. Only allowed once.
+### `qss` (Required, map)
 
-  host:
-  (string)(Required)
-  The URL or IP Address that points to your QuestDB database.
+Enables the QSS integration. Only allowed once.
 
-  port:
-  (int)(Required)
-  The port to the InfluxDB line protocol of your QuestDB installation. This is normally 9009 by default.
+| Key                      |  Type  | Required | Default | Description                                                                                                                                                                        |
+| :----------------------- | :----: | :------: | :-----: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `host`                   | string |   Yes    |    —    | The URL or IP address that points to your QuestDB database.                                                                                                                        |
+| `port`                   |  int   |   Yes    |    —    | The port of the InfluxDB line protocol of your QuestDB installation. This is normally `9009` by default.                                                                           |
+| `table_name`             | string |    No    |  `qss`  | The name of the QuestDB table QSS should store the state data in. Useful if you want to keep multiple Home Assistant instances or environments separated within the same QuestDB.  |
+| `max_batch_size`         |  int   |    No    |  `500`  | QSS keeps a single, persistent connection to QuestDB open and reuses it for many events. Rows are buffered and only flushed once this many rows have accumulated (see also below). |
+| `flush_interval_seconds` |  int   |    No    |   `5`   | The maximum number of seconds buffered rows may stay unflushed before being sent to QuestDB, even if `max_batch_size` has not yet been reached.                                    |
+| `authentication`         |  map   |    No    |    —    | Optional authentication settings — see [Authentication](#authentication) below.                                                                                                    |
+| `include`                |  map   |    No    |    —    | Entities/domains to include in recordings — see [Include / Exclude](#include--exclude) below.                                                                                      |
+| `exclude`                |  map   |    No    |    —    | Entities/domains to exclude from recordings — see [Include / Exclude](#include--exclude) below.                                                                                    |
 
-  table_name:
-  (string)(Optional)
-  The name of the QuestDB table QSS should store the state data in. Defaults to `qss`. Useful if you want to keep multiple Home Assistant instances or environments separated within the same QuestDB.
+#### Authentication
 
-  max_batch_size:
-  (int)(Optional)
-  QSS keeps a single, persistent connection to QuestDB open and reuses it for many events instead of opening a new connection per event. Rows are buffered and only sent to QuestDB once this many rows have accumulated (or once `flush_interval_seconds` has elapsed, whichever happens first). Defaults to `500`.
+Completely optional. Only needed if your QuestDB installation enforces authentication (requires an SSL setup, either via QuestDB Enterprise or a reverse proxy). See the [QuestDB documentation](https://questdb.io/docs/reference/api/ilp/authenticate) for details on how to create these credentials.
 
-  flush_interval_seconds:
-  (int)(Optional)
-  The maximum number of seconds buffered rows may stay unflushed before being sent to QuestDB, even if `max_batch_size` has not yet been reached. Defaults to `5`.
+| Key         |  Type  | Required | Default | Description                                                                        |
+| :---------- | :----: | :------: | :-----: | :--------------------------------------------------------------------------------- |
+| `ssl_check` |  bool  |    No    | `True`  | Set to `False` to suppress the SSL certificate check of your QuestDB installation. |
+| `kid`       | string |   Yes    |    —    | Your authentication kid.                                                           |
+| `d_key`     | string |   Yes    |    —    | Your authentication D Key.                                                         |
+| `x_key`     | string |   Yes    |    —    | Your authentication X Key.                                                         |
+| `y_key`     | string |   Yes    |    —    | Your authentication Y Key.                                                         |
 
-  authentication:
-  (dict)(Optional)
-  Under this entry you can, if desired, enter the authenication parameters necessary for your Quest DB installation. The entry is completely optional if your Quest DB installation does not have any additional authentication settings. Keep in mind that this authentication needs an SSL setup, either from QuestDB Enterprise or a reverse proxy.
+#### Include / Exclude
 
-    ssl_check:
-    (bool)(Optional)
-    If you want to surpress the check of the SSL certificate of your QuestDB installation, set this to `False`. Default to `True`
+Both are optional maps that control which entities QSS records. If `include` is set, only matching entities are recorded; `exclude` removes matching entities from being recorded.
 
-    kid:
-    (string)(Required)
-    Your authentication kid.
-
-    d_key: "your_d_key"
-    (string)(Required)
-    Your authentication D Key.
-
-    x_key: "your_x_key"
-    (string)(Required)
-    Your authentication X Key.
-
-    y_key: "your_y_key"
-    (string)(Required)
-    Your authentication Y Key.
-
-  exclude:
-  (map)(Optional)
-  Configure which integrations should be excluded from recordings.
-
-    domains:
-    (List[str])(Optional)
-    The list of domains to be excluded from recordings.
-
-    entities:
-    (List[str])(Optional)
-    The list of entity ids to be excluded from recordings.
-
-    entity_globs:
-    (List[str])(Optional)
-    Exclude all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
-
-  include:
-  (map)(Optional)
-  Configure which integrations should be included in recordings. If set, all other entities will not be recorded.
-
-    domains:
-    (List[str])(Optional)
-    The list of domains to be included in the recordings.
-
-    entities:
-    (List[str])(Optional)
-    The list of entity ids to be included in the recordings.
-
-    entity_globs:
-    (List[str])(Optional)
-    Include all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
-```
+| Key            |   Type    | Required | Description                                                                         |
+| :------------- | :-------: | :------: | :---------------------------------------------------------------------------------- |
+| `domains`      | List[str] |    No    | List of domains to include/exclude from recordings.                                 |
+| `entities`     | List[str] |    No    | List of entity ids to include/exclude from recordings.                              |
+| `entity_globs` | List[str] |    No    | List of glob patterns to include/exclude from recordings (e.g. `sensor.weather_*`). |
 
 ## Details
 

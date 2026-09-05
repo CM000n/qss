@@ -3,9 +3,9 @@
   "name": "QuestDB State Storage (QSS)",
   "codeowners": ["@CM000n"],
   "dependencies": [],
-  "documentation": "https://github.com/CM000n/QSS",
+  "documentation": "https://github.com/CM000n/qss",
   "iot_class": "local_push",
-  "issue_tracker": "https://github.com/CM000n/QSS/issues",
+  "issue_tracker": "https://github.com/CM000n/qss/issues",
   "requirements": ["questdb>=4.1.0", "tenacity>=9.0"],
-  "version": "v0.1.2"
+  "version": "0.1.4"
 }
