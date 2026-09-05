@@ -6,6 +6,9 @@ ISSUES_URL = "https://github.com/CM000n/qss/issues"
 
 CONF_HOST = "host"
 CONF_PORT = "port"
+CONF_TABLE_NAME = "table_name"
+
+DEFAULT_TABLE_NAME = "qss"
 
 CONF_AUTH = "authentication"
 CONF_AUTH_SSL_CHECK = "ssl_check"
