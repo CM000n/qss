@@ -59,9 +59,7 @@ Automatic (via [HACS](https://hacs.xyz/)):
 - QSS is part of the official HACS default repository collection, so it can be installed directly without adding a custom repository first: open HACS, search for "QuestDB State Storage (QSS)" and install it from there.
 - Alternatively, you can still add this repository as a custom repository to your HACS installation if you want to track a specific branch or fork.
 
-configuration.yaml
-
-- Add an entry to your Home Assistant `configuration.yaml` that might look like this::
+Add an entry to your Home Assistant `configuration.yaml` that might look like this — see the [Configuration](#configuration) section below for all available options:
 
 ```yaml
 qss:
@@ -80,92 +78,44 @@ qss:
       - "person.john_doe"
 ```
 
-Note: Authenication details are completely optional. How to create them can be found in the Quest DB documentation at this point:
-https://questdb.io/docs/reference/api/ilp/authenticate
-
 ## Configuration
 
-```yaml
-qss:
-(map)(Required)
-Enables the qss integration. Only allowed once.
+### `qss` (Required, map)
 
-  host:
-  (string)(Required)
-  The URL or IP Address that points to your QuestDB database.
+Enables the QSS integration. Only allowed once.
 
-  port:
-  (int)(Required)
-  The port to the InfluxDB line protocol of your QuestDB installation. This is normally 9009 by default.
+| Key                      |   Type    | Required |  Default  | Description                                                                                                                                                                              |
+| :----------------------- | :-------: | :------: | :-------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `host`                   |  string   |   Yes    |     —     | The URL or IP address that points to your QuestDB database.                                                                                                                              |
+| `port`                   |    int    |   Yes    |     —     | The port of the InfluxDB line protocol of your QuestDB installation. This is normally `9009` by default.                                                                                |
+| `table_name`             |  string   |    No    |   `qss`   | The name of the QuestDB table QSS should store the state data in. Useful if you want to keep multiple Home Assistant instances or environments separated within the same QuestDB.       |
+| `max_batch_size`         |    int    |    No    |   `500`   | QSS keeps a single, persistent connection to QuestDB open and reuses it for many events. Rows are buffered and only flushed once this many rows have accumulated (see also below).      |
+| `flush_interval_seconds` |    int    |    No    |    `5`    | The maximum number of seconds buffered rows may stay unflushed before being sent to QuestDB, even if `max_batch_size` has not yet been reached.                                         |
+| `authentication`         |    map    |    No    |     —     | Optional authentication settings — see [Authentication](#authentication) below.                                                                                                          |
+| `include`                |    map    |    No    |     —     | Entities/domains to include in recordings — see [Include / Exclude](#include--exclude) below.                                                                                            |
+| `exclude`                |    map    |    No    |     —     | Entities/domains to exclude from recordings — see [Include / Exclude](#include--exclude) below.                                                                                          |
 
-  table_name:
-  (string)(Optional)
-  The name of the QuestDB table QSS should store the state data in. Defaults to `qss`. Useful if you want to keep multiple Home Assistant instances or environments separated within the same QuestDB.
+#### Authentication
 
-  max_batch_size:
-  (int)(Optional)
-  QSS keeps a single, persistent connection to QuestDB open and reuses it for many events instead of opening a new connection per event. Rows are buffered and only sent to QuestDB once this many rows have accumulated (or once `flush_interval_seconds` has elapsed, whichever happens first). Defaults to `500`.
+Completely optional. Only needed if your QuestDB installation enforces authentication (requires an SSL setup, either via QuestDB Enterprise or a reverse proxy). See the [QuestDB documentation](https://questdb.io/docs/reference/api/ilp/authenticate) for details on how to create these credentials.
 
-  flush_interval_seconds:
-  (int)(Optional)
-  The maximum number of seconds buffered rows may stay unflushed before being sent to QuestDB, even if `max_batch_size` has not yet been reached. Defaults to `5`.
+| Key         |  Type  | Required | Default | Description                                                                                     |
+| :---------- | :----: | :------: | :-----: | :------------------------------------------------------------------------------------------------ |
+| `ssl_check` |  bool  |    No    | `True`  | Set to `False` to suppress the SSL certificate check of your QuestDB installation.               |
+| `kid`       | string |   Yes    |    —    | Your authentication kid.                                                                          |
+| `d_key`     | string |   Yes    |    —    | Your authentication D Key.                                                                        |
+| `x_key`     | string |   Yes    |    —    | Your authentication X Key.                                                                        |
+| `y_key`     | string |   Yes    |    —    | Your authentication Y Key.                                                                        |
 
-  authentication:
-  (dict)(Optional)
-  Under this entry you can, if desired, enter the authenication parameters necessary for your Quest DB installation. The entry is completely optional if your Quest DB installation does not have any additional authentication settings. Keep in mind that this authentication needs an SSL setup, either from QuestDB Enterprise or a reverse proxy.
+#### Include / Exclude
 
-    ssl_check:
-    (bool)(Optional)
-    If you want to surpress the check of the SSL certificate of your QuestDB installation, set this to `False`. Default to `True`
+Both are optional maps that control which entities QSS records. If `include` is set, only matching entities are recorded; `exclude` removes matching entities from being recorded.
 
-    kid:
-    (string)(Required)
-    Your authentication kid.
-
-    d_key: "your_d_key"
-    (string)(Required)
-    Your authentication D Key.
-
-    x_key: "your_x_key"
-    (string)(Required)
-    Your authentication X Key.
-
-    y_key: "your_y_key"
-    (string)(Required)
-    Your authentication Y Key.
-
-  exclude:
-  (map)(Optional)
-  Configure which integrations should be excluded from recordings.
-
-    domains:
-    (List[str])(Optional)
-    The list of domains to be excluded from recordings.
-
-    entities:
-    (List[str])(Optional)
-    The list of entity ids to be excluded from recordings.
-
-    entity_globs:
-    (List[str])(Optional)
-    Exclude all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
-
-  include:
-  (map)(Optional)
-  Configure which integrations should be included in recordings. If set, all other entities will not be recorded.
-
-    domains:
-    (List[str])(Optional)
-    The list of domains to be included in the recordings.
-
-    entities:
-    (List[str])(Optional)
-    The list of entity ids to be included in the recordings.
-
-    entity_globs:
-    (List[str])(Optional)
-    Include all entities matching a listed pattern from recordings (e.g., `sensor.weather_*`).
-```
+|      Key      |    Type    | Required | Description                                                                             |
+| :------------- | :--------: | :------: | :---------------------------------------------------------------------------------------- |
+| `domains`      | List[str]  |    No    | List of domains to include/exclude from recordings.                                       |
+| `entities`     | List[str]  |    No    | List of entity ids to include/exclude from recordings.                                    |
+| `entity_globs` | List[str]  |    No    | List of glob patterns to include/exclude from recordings (e.g. `sensor.weather_*`).       |
 
 ## Details
 
