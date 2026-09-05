@@ -4,13 +4,13 @@
   <h1>QuestDB State Storage (QSS)</h1>
   <p><strong>Store your Home Assistant entity states in QuestDB — fast, async and HACS-ready.</strong></p>
 
-  [![GitHub release](https://img.shields.io/github/v/release/CM000n/qss?style=for-the-badge&logo=homeassistantcommunitystore&color=blue)](https://github.com/CM000n/qss/releases)
-  [![HACS default](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge&logo=homeassistant)](https://github.com/hacs/default)
-  [![Validate](https://img.shields.io/github/actions/workflow/status/CM000n/qss/validate.yml?branch=main&style=for-the-badge&label=Validate)](https://github.com/CM000n/qss/actions/workflows/validate.yml)
-  [![Tests](https://img.shields.io/github/actions/workflow/status/CM000n/qss/tests.yml?branch=main&style=for-the-badge&label=Tests)](https://github.com/CM000n/qss/actions/workflows/tests.yml)
-  [![License](https://img.shields.io/github/license/CM000n/qss?style=for-the-badge)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/CM000n/qss?style=for-the-badge&logo=homeassistantcommunitystore&color=blue)](https://github.com/CM000n/qss/releases)
+[![HACS default](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge&logo=homeassistant)](https://github.com/hacs/default)
+[![Validate](https://img.shields.io/github/actions/workflow/status/CM000n/qss/validate.yml?branch=main&style=for-the-badge&label=Validate)](https://github.com/CM000n/qss/actions/workflows/validate.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/CM000n/qss/tests.yml?branch=main&style=for-the-badge&label=Tests)](https://github.com/CM000n/qss/actions/workflows/tests.yml)
+[![License](https://img.shields.io/github/license/CM000n/qss?style=for-the-badge)](LICENSE)
 
-  [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=CM000n&repository=qss&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=CM000n&repository=qss&category=integration)
 </div>
 
 QSS makes it possible to transfer state information of the Home Assistant entities simply and efficiently via InfluxDB Line Protocol into a QuestDB for long-term storage and later analysis.
