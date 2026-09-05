@@ -1,10 +1,14 @@
 """Helper functions for event handling and data insertion."""
 
-from collections.abc import Callable
-from queue import Queue
+from typing import TYPE_CHECKING
 
 from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import Event
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from queue import Queue
+
+    from homeassistant.core import Event
 
 
 def put_event_to_queue(

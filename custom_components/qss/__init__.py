@@ -5,8 +5,7 @@ import concurrent.futures
 import logging
 import queue
 import threading
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -20,7 +19,6 @@ from homeassistant.helpers.entityfilter import (
     INCLUDE_EXCLUDE_BASE_FILTER_SCHEMA,
     convert_include_exclude_filter,
 )
-from homeassistant.helpers.typing import ConfigType
 
 from .const import (
     CONF_AUTH,
@@ -31,6 +29,8 @@ from .const import (
     CONF_AUTH_Y_KEY,
     CONF_HOST,
     CONF_PORT,
+    CONF_TABLE_NAME,
+    DEFAULT_TABLE_NAME,
     DOMAIN,
 )
 from .event_handling import (
@@ -38,7 +38,12 @@ from .event_handling import (
     get_event_from_queue,
     put_event_to_queue,
 )
-from .io import insert_event_data_into_questdb
+from .io import QuestDBAuth, QuestDBConfig, insert_event_data_into_questdb
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from homeassistant.helpers.typing import ConfigType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,6 +65,7 @@ CONFIG_SCHEMA = vol.Schema(
             {
                 vol.Required(CONF_HOST): cv.string,
                 vol.Required(CONF_PORT): cv.positive_int,
+                vol.Optional(CONF_TABLE_NAME, default=DEFAULT_TABLE_NAME): cv.string,
                 vol.Optional(CONF_AUTH, default={}): AUTHENTICATION_SCHEMA,
             }
         )
@@ -74,19 +80,22 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     db_host = str(conf.get(CONF_HOST))
     db_port = int(conf.get(CONF_PORT))
+    db_table_name = str(conf.get(CONF_TABLE_NAME))
 
     entity_filter = convert_include_exclude_filter(conf)
 
-    auth_kid = conf.get(CONF_AUTH).get(CONF_AUTH_KID)
-    auth_ssl_check = conf.get(CONF_AUTH).get(CONF_AUTH_SSL_CHECK)
-    auth_d_key = conf.get(CONF_AUTH).get(CONF_AUTH_D_KEY)
-    auth_x_key = conf.get(CONF_AUTH).get(CONF_AUTH_X_KEY)
-    auth_y_key = conf.get(CONF_AUTH).get(CONF_AUTH_Y_KEY)
-    db_auth = (auth_kid, auth_d_key, auth_x_key, auth_y_key, auth_ssl_check)
-
-    instance = QuestDB(
-        hass=hass, host=db_host, port=db_port, entity_filter=entity_filter, auth=db_auth
+    db_auth = QuestDBAuth(
+        kid=conf.get(CONF_AUTH).get(CONF_AUTH_KID),
+        d_key=conf.get(CONF_AUTH).get(CONF_AUTH_D_KEY),
+        x_key=conf.get(CONF_AUTH).get(CONF_AUTH_X_KEY),
+        y_key=conf.get(CONF_AUTH).get(CONF_AUTH_Y_KEY),
+        ssl_check=conf.get(CONF_AUTH).get(CONF_AUTH_SSL_CHECK),
     )
+    db_config = QuestDBConfig(
+        host=db_host, port=db_port, table_name=db_table_name, auth=db_auth
+    )
+
+    instance = QuestDB(hass=hass, entity_filter=entity_filter, config=db_config)
     instance.async_initialize()
     instance.start()
 
@@ -99,19 +108,15 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
     def __init__(
         self,
         hass: HomeAssistant,
-        host: str,
-        port: int,
         entity_filter: Callable[[str], bool],
-        auth: tuple,
+        config: QuestDBConfig,
     ) -> None:
         """Initialize qss."""
         threading.Thread.__init__(self, name="QSS")
 
         self.hass = hass
-        self.host = host
-        self.port = port
         self.entity_filter = entity_filter
-        self.auth = auth
+        self.config = config
 
         self.queue: Any = queue.Queue()
         self.qss_ready = asyncio.Future()
@@ -168,9 +173,7 @@ class QuestDB(threading.Thread):  # pylint: disable = R0902
             # Check if shutdown is in progress
             if self.shutdown_event.is_set():
                 break
-            insert_event_data_into_questdb(
-                self.host, self.port, self.auth, event, self.queue
-            )
+            insert_event_data_into_questdb(self.config, event, self.queue)
 
     @callback
     def event_listener(self, event: Event) -> None:

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+
+# Testing & coverage
+.pytest_cache/
+.cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Ruff
+.ruff_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

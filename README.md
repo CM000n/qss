@@ -70,6 +70,10 @@ Enables the qss integration. Only allowed once.
   (int)(Required)
   The port to the InfluxDB line protocol of your QuestDB installation. This is normally 9009 by default.
 
+  table_name:
+  (string)(Optional)
+  The name of the QuestDB table QSS should store the state data in. Defaults to `qss`. Useful if you want to keep multiple Home Assistant instances or environments separated within the same QuestDB.
+
   authentication:
   (dict)(Optional)
   Under this entry you can, if desired, enter the authenication parameters necessary for your Quest DB installation. The entry is completely optional if your Quest DB installation does not have any additional authentication settings. Keep in mind that this authentication needs an SSL setup, either from QuestDB Enterprise or a reverse proxy.
@@ -129,11 +133,28 @@ Enables the qss integration. Only allowed once.
 
 ## Details
 
-The data is stored in a QuestDB table named `qss`, which has the following structure:
+The data is stored in a QuestDB table named `qss` by default (configurable via `table_name`), which has the following structure:
 
 | Column name: | entity_id | state  | attributes | timestamps |
 | :----------- | :-------: | :----: | :--------: | :--------: |
 | Type:        |  symbol   | string |   string   | timestamps |
+
+## Development
+
+QSS uses [Poetry](https://python-poetry.org/) for dependency management and [pytest](https://pytest.org/) (via [`pytest-homeassistant-custom-component`](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component)) for testing. It requires Python 3.14+, matching the Python version required by current Home Assistant releases.
+
+```bash
+# Install dependencies (including dev/test dependencies)
+poetry install
+
+# Run the test suite with coverage
+poetry run pytest tests/
+
+# Run linting/formatting
+poetry run pre-commit run --all-files
+```
+
+The test suite covers the entity filtering logic, the QuestDB ingestion/retry behavior, and the integration setup/shutdown lifecycle without requiring a running QuestDB instance or Home Assistant installation.
 
 ## Credits
 

@@ -13,7 +13,7 @@ keywords = [
 dynamic = ["version", "dependencies"]
 readme = "README.md"
 authors = [{name = "CM000n"}]
-requires-python = '>=3.13.2,<3.14'
+requires-python = '>=3.14.2,<3.15'
 
 [tool.poetry]
 version = "v0.1.2"
@@ -29,6 +29,7 @@ tenacity = "^9.0.0"
 voluptuous-stubs = "^0.1"
 homeassistant-stubs = "^2026"
 pre-commit = "^4.0.0"
+pytest-homeassistant-custom-component = "0.13.363"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -38,8 +39,21 @@ build-backend = "poetry.core.masonry.api"
 fix = true
 lint.exclude = ["tests/**"]
 lint.select = ["ALL"]
-lint.extend-ignore = ["D203", "D213", "COM812"]
+lint.extend-ignore = ["D203", "D213", "COM812", "CPY001"]
 lint.pydocstyle.convention = "google"
 lint.isort.split-on-trailing-comma = false
 format.docstring-code-format = true
 format.skip-magic-trailing-comma = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+norecursedirs = [".git", "*.egg", "build", "dist"]
+required_plugins = ["pytest-homeassistant-custom-component"]
+addopts = "--cov=custom_components.qss --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["custom_components/qss"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
