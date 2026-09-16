@@ -1,10 +1,11 @@
 """Helper functions for IO operations on QuestDB."""
 
 import logging
+import re
 from dataclasses import dataclass, field
 from json import dumps
 from time import monotonic
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from questdb.ingress import IngressError, Protocol, Sender
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
@@ -23,6 +24,35 @@ if TYPE_CHECKING:
     from homeassistant.core import Event
 
 _LOGGER = logging.getLogger(__name__)
+
+# ASCII control characters that some entities occasionally emit as part of
+# their state or attribute values (e.g. raw sensor payloads or text
+# containing embedded newlines/escape sequences). The JSON spec requires all
+# of U+0000-U+001F (and U+007F) to be escaped inside a string, but QuestDB
+# has been observed to write these bytes verbatim into its JSON query
+# responses without escaping them, which then fails client-side JSON parsing
+# (see https://github.com/CM000n/qss/issues/230). They are stripped before
+# data is sent to QuestDB so stored values never contain them in the first
+# place, regardless of how QuestDB later serializes them.
+_CONTROL_CHARS_RE = re.compile(r"[\x00-\x1f\x7f]")
+
+
+def _strip_control_characters(value: str) -> str:
+    """Remove ASCII control characters that QuestDB may fail to JSON-escape."""
+    return _CONTROL_CHARS_RE.sub("", value)
+
+
+def _sanitize_value(value: Any) -> Any:  # noqa: ANN401
+    """Recursively strip control characters from any string in ``value``."""
+    if isinstance(value, str):
+        return _strip_control_characters(value)
+    if isinstance(value, dict):
+        return {key: _sanitize_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_sanitize_value(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_sanitize_value(item) for item in value)
+    return value
 
 
 @dataclass(frozen=True)
@@ -74,12 +104,12 @@ def _insert_row(sender: Sender, event: Event, table_name: str) -> None:
     """
     entity_id = event.data["entity_id"]
     state = event.data.get("new_state")
-    attrs = dict(state.attributes)
+    attrs = _sanitize_value(dict(state.attributes))
     sender.row(
         table_name,
         symbols={"entity_id": entity_id},
         columns={
-            "state": state.state,
+            "state": _strip_control_characters(state.state),
             "attributes": dumps(attrs, sort_keys=True, default=str),
         },
         at=event.time_fired,

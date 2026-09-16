@@ -98,6 +98,45 @@ def test_insert_row_writes_expected_row_without_flushing() -> None:
     sender.flush.assert_not_called()
 
 
+def test_insert_row_strips_control_characters_from_state() -> None:
+    """Control characters in the state must be stripped before sending.
+
+    QuestDB has been observed to write raw control characters verbatim into
+    its JSON query responses without escaping them, producing invalid JSON
+    that HA's frontend fails to parse (see
+    https://github.com/CM000n/qss/issues/230).
+    """
+    sender = MagicMock()
+    event = make_state_changed_event("sensor.text", "bad\x00\x1bstate\x7fend")
+
+    _insert_row(sender, event, "qss")
+
+    _, kwargs = sender.row.call_args
+    assert kwargs["columns"]["state"] == "badstateend"
+
+
+def test_insert_row_strips_control_characters_from_nested_attributes() -> None:
+    """Control characters nested in attribute strings/lists must be stripped."""
+    sender = MagicMock()
+    event = make_state_changed_event(
+        "sensor.text",
+        "ok",
+        attributes={
+            "note": "line1\nline2\x07",
+            "options": ["a\x01b", "c"],
+            "nested": {"deep": "value\x1f"},
+        },
+    )
+
+    _insert_row(sender, event, "qss")
+
+    _, kwargs = sender.row.call_args
+    attrs = loads(kwargs["columns"]["attributes"])
+    assert attrs["note"] == "line1line2"
+    assert attrs["options"] == ["ab", "c"]
+    assert attrs["nested"] == {"deep": "value"}
+
+
 def test_insert_row_uses_configured_table_name() -> None:
     """A custom table name should be forwarded to the sender as-is."""
     sender = MagicMock()
