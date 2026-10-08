@@ -22,7 +22,7 @@ requires-poetry = '>=2.0,<3.0'
 
 [tool.poetry.dependencies]
 homeassistant = "^2026"
-questdb = "^4.1.0"
+questdb = "^5.0.0"
 tenacity = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]
