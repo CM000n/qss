@@ -29,7 +29,7 @@ tenacity = "^9.0.0"
 voluptuous-stubs = "^0.1"
 homeassistant-stubs = "^2026"
 pre-commit = "^4.0.0"
-pytest-homeassistant-custom-component = "0.13.370"
+pytest-homeassistant-custom-component = "0.13.371"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
