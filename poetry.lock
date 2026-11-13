@@ -4974,59 +4974,61 @@ files = [
 
 [[package]]
 name = "questdb"
-version = "4.1.0"
+version = "6.1.0"
 description = "QuestDB client library for Python"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "questdb-4.1.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:035cd3ea995914cefb0afbd2c5e1da562ac8543b5f65d129392ad855e03bc2d5"},
-    {file = "questdb-4.1.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:b41a572d20e83166d6b6d99fcfd8c6a7669f8cef8f6d7e98587b285aba19fc22"},
-    {file = "questdb-4.1.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7f7106dac082442ebb1b518649651f151db3589e2892fc8a9c082087c02f240c"},
-    {file = "questdb-4.1.0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:7b37b1010c2233dedcfa5641ccc1113e73cc1ac95563827b2bc09f0d5f2a999c"},
-    {file = "questdb-4.1.0-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:91a9720d74d2f79574127762fcbbe192ec2491ea7a5c99463be578c221ff2e82"},
-    {file = "questdb-4.1.0-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:2785a8d33b910cf4f98dc5b9cc29c3a250e915cc6dea137424fe3671496b51d6"},
-    {file = "questdb-4.1.0-cp310-cp310-win32.whl", hash = "sha256:bb4d653f4048d4ff51629038d6a685c4a3cbbd2cff31e47fb8fd022eebbd8528"},
-    {file = "questdb-4.1.0-cp310-cp310-win_amd64.whl", hash = "sha256:a16513450562f0a7d37c73672645835c18f6b52fdac95accd28a50c48c46424c"},
-    {file = "questdb-4.1.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:54ea64fa965e2392ac085db367b405fdd130fc0b3db1f9cc6087b5c643cadf3f"},
-    {file = "questdb-4.1.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:dbe9211d5d8ef4f8ebef66d985a86f8a8c585b311b6720960b8360a185ded310"},
-    {file = "questdb-4.1.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d5db7bb38055332d06b18e024ea5c55dec72ecebc110b111b89f8f243993e6f7"},
-    {file = "questdb-4.1.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:acd507b8aed0678f69cfdb8e508951ff7bb17c413704d35d542c7ec49b32e4ba"},
-    {file = "questdb-4.1.0-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:3656ecc5ad557546f87e96e33205b237c09ae2c12f63522ccec179981d27a88d"},
-    {file = "questdb-4.1.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:df36f87aedd5dbd1e468cc115df74701a45f3b65524a36611260511fe52c9246"},
-    {file = "questdb-4.1.0-cp311-cp311-win32.whl", hash = "sha256:4c5c698ab5282a055079d86c0981bd0a2d7bff1c6dfdf20684c4a1189926c3c4"},
-    {file = "questdb-4.1.0-cp311-cp311-win_amd64.whl", hash = "sha256:65f49794d17ff2fe79fcda2fc30fe52f28b71193c2f39e792f62b6f29ce86784"},
-    {file = "questdb-4.1.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:853116ab7d6632625c40bc839daf9062f7529b5f95f771606a11ec4adf963dd9"},
-    {file = "questdb-4.1.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:07a34431b67314c5883268c6e4392d1b46d9089e0ec6b011f8b0857b81800fab"},
-    {file = "questdb-4.1.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bb3ed463daf1ca3d01084f246572ee69f5505c124a2d3aabe9ccc8a5fc2d3278"},
-    {file = "questdb-4.1.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:1e683f33727e8edc693ac266beeb82a8002bec6671b0061954ec6d079b1b8597"},
-    {file = "questdb-4.1.0-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:be27f902c81d1f8b653cfbabbad4a64f32a61f2db22a1b42936f29203db9fc49"},
-    {file = "questdb-4.1.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:83a9d31ed56eff241876b9475d8b38ee46088603fef923e20694e3c99b8fd92f"},
-    {file = "questdb-4.1.0-cp312-cp312-win32.whl", hash = "sha256:09f4cbb135779a33353feabba1f24d8281639d98c9596b2276736f76ef23ef6b"},
-    {file = "questdb-4.1.0-cp312-cp312-win_amd64.whl", hash = "sha256:f42b392f5cfcdec18dad05477a61247e1e82d8c67386b36fd73fa6d57fbcc00d"},
-    {file = "questdb-4.1.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:33dc5d67807a304f019fdda8f74459f4782681755e2926dd5dce6fca5cd1a5a1"},
-    {file = "questdb-4.1.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:39d276351519bf702214bf1cf3ac55f0715a692f514a6efcc3c28d813cecd324"},
-    {file = "questdb-4.1.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2189b664b0745bebfb7e3b6cc4a25da849dbcf192f1e1ca7e686c604dc9b6051"},
-    {file = "questdb-4.1.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:4afee5e4f5b97f78932e3bba5cd4a6e2b06a001f1d5e7665d95cfcbd394d80db"},
-    {file = "questdb-4.1.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:4aedda5cc08a7686165633fc8814b34ca2a9dfaf306a7f279dd74f9cb1e1a8a3"},
-    {file = "questdb-4.1.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:3c6300701ae1e95a7395c168288e13286421f33a620cd21ed1e97bd788922d27"},
-    {file = "questdb-4.1.0-cp313-cp313-win32.whl", hash = "sha256:f0b57153c4a177c19e0243e130f1558210a0deea77cd254448191bf7392ccb6f"},
-    {file = "questdb-4.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:a7857d8ba4f919475e22b94011604198049e970d94ce0f1bdc7186cd1fe1b105"},
-    {file = "questdb-4.1.0-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:c4c37cd028d864b7c0584e63822c1d74e03cf477056d88ef31cf9c153b436632"},
-    {file = "questdb-4.1.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:b63723a63e8af95ad9b4b2ee1cfa09585375e44e4fdd8d02bbed2ae29f41b2ed"},
-    {file = "questdb-4.1.0-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:8e4db50b13d806a5185280d2519d0d24f64c0ba2f369377e3f13838260751dae"},
-    {file = "questdb-4.1.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:b93bec78f0a2607f3164a54a4bc5bfd3522b0b1d7025b01d229ae9f2dbd90e46"},
-    {file = "questdb-4.1.0-cp314-cp314-win32.whl", hash = "sha256:80462e6c4aeb441acb430c409a8bee7e861fa5fe3cc455f7b54e6acc8031f14c"},
-    {file = "questdb-4.1.0-cp314-cp314-win_amd64.whl", hash = "sha256:78ae5407a24883779a5df8d013ad30335ea64245e8e11176e5d35d907bbc74c5"},
-    {file = "questdb-4.1.0-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:44b0e5bae301484ac169eb74058cd722d5e26fe0640200615079fd7c629236f2"},
-    {file = "questdb-4.1.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:ae54862ac73bcfb7b1d17771693872e04f2659b04180bdf24259f46012b0bb66"},
-    {file = "questdb-4.1.0-cp314-cp314t-manylinux_2_28_x86_64.whl", hash = "sha256:b7f9f437f594b88c7e4c6cf9c683c809ecd5f2020446d82be47e4f12e0295cfd"},
-    {file = "questdb-4.1.0-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:bee0c5df4513e6c30f9d24fd3feedc08f0528b3daa990bed4eb31deebceffa85"},
-    {file = "questdb-4.1.0-pp310-pypy310_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:03005857b35a0c2c5f1f984726543a73b3f99cf8606745b098dd8a8863959f72"},
-    {file = "questdb-4.1.0-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:4e3b7575a25b297997c4c2ead91708f2b6a75168e62b2361db2ef9f3a4465279"},
-    {file = "questdb-4.1.0-pp311-pypy311_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c2272624a5645d956b7940733420d4929f8447780f5ae91f681ba6baa648833c"},
-    {file = "questdb-4.1.0-pp311-pypy311_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:4bb2ca14152c8d04a8a46e04105b47f2291cef17aa69b3c9697fb5dee3fb0728"},
-    {file = "questdb-4.1.0.tar.gz", hash = "sha256:d899daf474bf66c57dd3f6a8e9bb1f928430b5e5bd115b10bddb418c0330aaec"},
+    {file = "questdb-6.1.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:404b0f15e096cad6b65c0a2fe9f26e841a1a6e7b8f986215ab28800e74eb2b29"},
+    {file = "questdb-6.1.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:017d84da11ac80e724bfd753b44f10fce5b9162ee287f5e8caa67fcd540882ed"},
+    {file = "questdb-6.1.0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:5ce820a9662684ffe91821607acf26cc44b5c5074a33c8323a6940f7729ec567"},
+    {file = "questdb-6.1.0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:ba7f1a2e1eb7829750e93a6a5043cc9186b1ec54eea9cc33447daac5ba626ef8"},
+    {file = "questdb-6.1.0-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:2d16e1a32068aa4dfd1c12399eb085245184c2564017950b9fa8032d93384860"},
+    {file = "questdb-6.1.0-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:c3a5d560d088631da6ef489f4a65e6bca30f90f38e1f048fdd446d98a5952e12"},
+    {file = "questdb-6.1.0-cp310-cp310-win32.whl", hash = "sha256:ff87900b7fa0f8375480d3048fe1d4c9f1220739fe57b64c225bf604a87f0bdb"},
+    {file = "questdb-6.1.0-cp310-cp310-win_amd64.whl", hash = "sha256:a588362a5d63958bcac43db1623fc90eab8a0b0790ca71082ae1caeb4c3c18db"},
+    {file = "questdb-6.1.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:3df637759bd8f6b0562ede54723789910bef606ceb20daba63b68dc832829c7d"},
+    {file = "questdb-6.1.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:c0ad846c73e0681aad58e71acd43b6efa5c9b8d06a7d8efe64712ae2d7fadcbd"},
+    {file = "questdb-6.1.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:e3f1c2d79d6c41594bec45bb3f3f7a0f71ce7ec1c2b4a29bf684ddb7c867ebc7"},
+    {file = "questdb-6.1.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:43d9034c404d9f2a0e5751481cc359a14e9b6fac0df20fd625b2acad873a1dd0"},
+    {file = "questdb-6.1.0-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:c16e9eae5dd7c4c980181a87b18dfbc0f5c5ba7ab9bb49d3f35d65f38c3ebc9b"},
+    {file = "questdb-6.1.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:4c0feef94f11e272e59a4760e50ecd51d7733c32b33c7f53b7ed30758d4f2d42"},
+    {file = "questdb-6.1.0-cp311-cp311-win32.whl", hash = "sha256:cf035497a79f321adf9fdaaabf9f30b2985cbee55a401f00c3d0404dc43a1a5f"},
+    {file = "questdb-6.1.0-cp311-cp311-win_amd64.whl", hash = "sha256:02b543fe454034f921f2bfbe773b071e6c3d6f3c3125101ec746ed6763a63304"},
+    {file = "questdb-6.1.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:c75de885c9a5643d72435ba393330a76905c530cd5152ccad65f347a278fc5bd"},
+    {file = "questdb-6.1.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:19ed001402e5c1d1a951c9570d2cd059572d9234015259b27698f5f8394d864e"},
+    {file = "questdb-6.1.0-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:9720a9dc9834e438b114c23343943ec0117a56307c0c308be59fa38bd2825c9c"},
+    {file = "questdb-6.1.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:4353db7de110e11a04fea5db6292a33385620af2306564da2e8ca7ecef322d13"},
+    {file = "questdb-6.1.0-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:e239f1e625dc0e5b6293284e2bca6c29c2d49c9ba18813d2e9816cde47201ff5"},
+    {file = "questdb-6.1.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:c813f28b76f395a53f43bfff86a97ba1fedb0673fbca3da38527fad34227ebf2"},
+    {file = "questdb-6.1.0-cp312-cp312-win32.whl", hash = "sha256:adb463a00e41f2e3cc772ebab057357b456054f07e5d36fc437ae3d4b0f7a2ea"},
+    {file = "questdb-6.1.0-cp312-cp312-win_amd64.whl", hash = "sha256:7cf3db34cb5646c04d2c969bcb436f3edf72ae862c3970834172d46660ec7bfe"},
+    {file = "questdb-6.1.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:1227ed16205c0e84e29c599fcaf1ee2b7d188259e95575a28828fd7e4e144895"},
+    {file = "questdb-6.1.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:237cc24c5837da2470193413b8528c65b66e80af790885c2699d648c39f75a3c"},
+    {file = "questdb-6.1.0-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:a6dfca6bcda83f9738b71bb28b132bce6fb76e0c2ab6901f8d42e19e82b56365"},
+    {file = "questdb-6.1.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:3dab4cfbc5f9e5119ce048453d4f93baba9d43151afc30d070d54220ec3e7ff2"},
+    {file = "questdb-6.1.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:645e29b5b19680b5eb2609542a56d4792e9cacf91f32ba9e6b52ebae2b3aa8bf"},
+    {file = "questdb-6.1.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:f2818f5d0ddb5075e37f6015a38f21016b4486b4c9e4375b8cbae94ee6fb2a8c"},
+    {file = "questdb-6.1.0-cp313-cp313-win32.whl", hash = "sha256:f1eb50fe2884eb32eaba972ef5cf0dbce366a01d792975fcc478cbbca653be21"},
+    {file = "questdb-6.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:fa724653747e3ce1f72d32749328ce09b37c348ae5a30fdf8affc480bc8be9d3"},
+    {file = "questdb-6.1.0-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:3e90cec87294fbf541d41d51db007db6ec2c46d9dd670bf3c2a2a0da0d9f0e54"},
+    {file = "questdb-6.1.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:fd8e677431590097f12955d43b85d5ff1514795421c31a7e1b44d5a382b8b675"},
+    {file = "questdb-6.1.0-cp314-cp314-manylinux_2_28_aarch64.whl", hash = "sha256:183303e01cc2b0043abfe312e27ff922dc48daf62c37175b0887ab2c8b6ab571"},
+    {file = "questdb-6.1.0-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:5999ed868a3006c1f06256053ce846b1abd61d4d095744744466f4898fe3da05"},
+    {file = "questdb-6.1.0-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:0997b32f675c3f25f03e307215f8d75141513d725e6b495d5549d925cd57b205"},
+    {file = "questdb-6.1.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:4eb4d5cf6bd1797bb8eb39e71c12ed48709a1dc422ca6a76b7cec1199f816700"},
+    {file = "questdb-6.1.0-cp314-cp314-win32.whl", hash = "sha256:be4799a21456b3a8d7efac203527927a6414b4bc61a5a39fdca3c0bc488c3221"},
+    {file = "questdb-6.1.0-cp314-cp314-win_amd64.whl", hash = "sha256:61409bf28c4254943a63ec7300721f729198ad02007d97b0f5f14a276d14566f"},
+    {file = "questdb-6.1.0-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:5f0df8a3184bffd3217f396e289396210e8db70653d9105e6aa3ce48dffabdaf"},
+    {file = "questdb-6.1.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:d9b5eb7049b30d43f2e07c366f1019e60be483f691c789b8df14d21c6030ba77"},
+    {file = "questdb-6.1.0-cp314-cp314t-manylinux_2_28_aarch64.whl", hash = "sha256:d10ca7d700267f023526911d27b39d55c9096a91d30dd10bc27efeaacedd243c"},
+    {file = "questdb-6.1.0-cp314-cp314t-manylinux_2_28_x86_64.whl", hash = "sha256:6aaec34562b2ef486b402304a8dacce92dc47a5e43b5936ecfa1d32ab499307c"},
+    {file = "questdb-6.1.0-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:b90c25ccb897642bc53de0ccaf3462417b0ded99e08d8cfe945ce40724eeee0f"},
+    {file = "questdb-6.1.0-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:30be59308e8d4cd2bdb83e8d82fc775296549ade02738f00024de2c89f6def63"},
+    {file = "questdb-6.1.0-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:31c18d04ab2f89cfe56b6ad7375ef89188c6f6721b05b50d632fb263be7f4b65"},
+    {file = "questdb-6.1.0-pp311-pypy311_pp80-manylinux_2_28_x86_64.whl", hash = "sha256:341f016e3d6860b70097022f1dd303c48ff0f04fc8f95341d623ef345558340f"},
+    {file = "questdb-6.1.0.tar.gz", hash = "sha256:870e0af067aaf176777f45c20e892f3b5face7dcdc911f407b94214182d9ca43"},
 ]
 
 [package.dependencies]
@@ -5034,7 +5036,9 @@ numpy = ">=1.21.0"
 
 [package.extras]
 ci = ["cibuildwheel"]
-dataframe = ["numpy", "pandas", "pyarrow"]
+dataframe = ["pandas (>=2.2.0)", "pyarrow (>=14.0.1)"]
+duckdb = ["duckdb (>=1.2.0)"]
+polars = ["polars (>=1.32.0)", "pyarrow (>=14.0.1)"]
 publish = ["twine", "wheel"]
 
 [[package]]
@@ -6321,4 +6325,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14.2,<3.15"
-content-hash = "24ed3cf914ab905190a8dd243b06a8c5bb277f08990256f2cf694f366b4493de"
+content-hash = "6e342fae771aeaddf95af401ae06deb83b8cbc2cf5754bf5dd16b65f608a1ff2"
